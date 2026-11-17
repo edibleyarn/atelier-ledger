@@ -4,118 +4,167 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Atelier Ledger</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%231c2440'/%3E%3Cpath d='M32 14l4.5 13.5L50 32l-13.5 4.5L32 50l-4.5-13.5L14 32l13.5-4.5z' fill='%23f4efe3'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231c2440'/%3E%3Cpath d='M32 9C30 21 24 31 15 40h34C40 31 34 21 32 9z' fill='%23f4efe3'/%3E%3Cpath d='M9 44c8-4 38-4 46 0' fill='none' stroke='%23f4efe3' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English&family=Alegreya+Sans:wght@400;500;700&display=swap">
 <style>
-/* Layout: an ink-on-paper ledger. Summary seals on top, a "waiting on clients" strip, then commission folios; each piece carries a row of ink-circle steps. */
+/* ---------- Design system: every colour, size, gap, radius and motion value comes from these tokens. ---------- */
 :root {
+  /* colour */
   --paper: #f4efe3;
   --paper-2: #ebe3d1;
   --card: #fbf8f1;
   --ink: #1c2440;
-  --ink-soft: #4f5775;
+  --ink-soft: #454d69;
   --line: #d8ccb2;
-  --wash: #4f73a0;
+  --wash: #35588a;
   --wash-bg: #dfe8f3;
-  --gold: #94681c;
+  --gold: #765210;
   --gold-bg: #f3e4c3;
-  --done: #2c5b4d;
+  --done: #23503f;
   --done-bg: #d9eae1;
-  --danger: #a13a2e;
+  --danger: #942c22;
   --danger-bg: #f6dfd9;
+  --scrim: rgba(19,24,41,.45);
   --shadow: 0 1px 0 rgba(28,36,64,.06), 0 8px 24px -16px rgba(28,36,64,.35);
+  --shadow-pop: 0 16px 40px -12px rgba(0,0,0,.45);
+
+  /* type */
   --display: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
   --body: 'Alegreya Sans', 'Gill Sans', 'Trebuchet MS', system-ui, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --fs-1: .8rem;   /* labels */
+  --fs-2: .9rem;   /* secondary text */
+  --fs-3: 1rem;    /* body */
+  --fs-4: 1.3rem;  /* card titles */
+  --fs-5: 1.6rem;  /* dialog titles */
+  --fs-6: 2rem;    /* summary numbers */
+  --fs-7: clamp(2rem, 5vw, 2.8rem); /* page title */
+
+  /* space: 4px grid */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+
+  /* radius: nested corners use calc(outer - padding) */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-pill: 999px;
+
+  /* motion */
+  --t-fast: 140ms; --t-med: 260ms; --t-slow: 520ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);       /* slow out */
+  --ease-in: cubic-bezier(.55, 0, 1, .45);        /* slow in */
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);     /* slow in, slow out */
+  --ease-back: cubic-bezier(.34, 1.56, .64, 1);   /* overshoot, for follow-through */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #131829; --paper-2: #1a2036; --card: #1d2440; --ink: #eee6d2; --ink-soft: #b2b7cb; --line: #333b5c;
-    --wash: #93b3da; --wash-bg: #24334f; --gold: #dcb76b; --gold-bg: #3a3122; --done: #8fcab3; --done-bg: #1e3a33;
-    --danger: #ec9488; --danger-bg: #43231f; --shadow: 0 1px 0 rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.8);
+    --paper: #131829; --paper-2: #1a2036; --card: #1d2440; --ink: #eee6d2; --ink-soft: #b9bed1; --line: #333b5c;
+    --wash: #9dbbe0; --wash-bg: #24334f; --gold: #e2bf76; --gold-bg: #3a3122; --done: #95cfb8; --done-bg: #1e3a33;
+    --danger: #f0a196; --danger-bg: #43231f; --scrim: rgba(0,0,0,.55);
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.8);
     color-scheme: dark;
   }
 }
+
+/* ---------- base ---------- */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 16px;
+  font-size: var(--fs-3);
   line-height: 1.45;
+  font-variant-numeric: tabular-nums lining-nums;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 64px;
+  padding-block: var(--sp-5) var(--sp-7);
+  background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(60rem 30rem at 0% -10%, var(--wash-bg), transparent 70%),
+    radial-gradient(50rem 30rem at 105% 10%, var(--gold-bg), transparent 65%);
+  background-attachment: fixed;
 }
 [hidden] { display: none !important; }
-.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; }
+p { text-wrap: pretty; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: var(--wash); }
 :focus-visible { outline: 2px solid var(--wash); outline-offset: 2px; }
+.ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
-.top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.sigil { width: 64px; height: 64px; flex: none; color: var(--ink); }
-.title { flex: 1 1 260px; min-width: 0; }
-.title h1 { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1; }
-.title p { margin: 6px 0 0; color: var(--ink-soft); font-style: italic; font-family: var(--display); font-size: 1.05rem; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+/* Background magic circle: the one piece of atmosphere, drawn in the same ink as everything else. */
+.halo { position: fixed; width: 640px; height: 640px; top: -230px; right: -240px; color: var(--gold); opacity: .12; pointer-events: none; z-index: 0; }
+.wrap { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--sp-5); }
+
+/* ---------- header ---------- */
+.top { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.sigil { width: 60px; height: 60px; flex: none; color: var(--ink); margin-left: -4px; /* the circle's stroke sits inside the box; pull it to the text edge */ }
+.title { flex: 1 1 220px; min-width: 0; }
+.title h1 { font-size: var(--fs-7); line-height: 1; }
+.actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+/* ---------- buttons ---------- */
 .btn {
   border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
-  padding: 8px 14px; border-radius: 999px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-pill); font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px; position: relative;
+  transition: transform var(--t-fast) var(--ease-out), background-color var(--t-med) var(--ease-inout), border-color var(--t-med) var(--ease-inout);
 }
-.btn:disabled { opacity: .6; cursor: progress; }
+.btn .ico { width: 16px; height: 16px; margin-left: -3px; /* an icon's empty side bearing reads as extra padding */ }
+.btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .7; cursor: progress; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--ink-soft); }
-.btn.small { padding: 4px 10px; font-size: .88rem; }
+.btn.small { padding: var(--sp-1) var(--sp-3); font-size: var(--fs-2); }
 .btn.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
 .btn.danger.armed { background: var(--danger); color: var(--paper); }
-.link { background: none; border: 0; padding: 2px 4px; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; font-size: .88rem; }
+.btn.busy { color: transparent; }
+.btn.busy::after { content: ''; position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--paper); border-right-color: transparent; animation: spin .8s linear infinite; }
+.btn.ghost.busy::after { border-color: var(--ink); border-right-color: transparent; }
+.link { background: none; border: 0; padding: 2px var(--sp-1); color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; font-size: var(--fs-2); }
 .link:hover { color: var(--ink); }
+.link.armed { color: var(--danger); font-weight: 700; }
 
-.seals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.seal { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.seal .k { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
-.seal .v { font-family: var(--display); font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.seal .s { font-size: .88rem; color: var(--ink-soft); }
-.seal.gold .v { color: var(--gold); }
+/* ---------- summary ---------- */
+.seals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.seal { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.seal .k { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+.seal .v { font-size: var(--fs-6); font-weight: 500; line-height: 1.1; overflow-wrap: anywhere; margin-left: -.04em; /* large numerals carry a left side bearing */ }
+.seal .v.multi { font-size: var(--fs-5); line-height: 1.2; }
+.seal .s { font-size: var(--fs-2); color: var(--ink-soft); }
 .seal.wash .v { color: var(--wash); }
 .seal.red .v { color: var(--danger); }
+.seal.gold .v { color: var(--gold); }
 
-.waiting { background: var(--gold-bg); border: 1px dashed var(--gold); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.waiting h2 { font-size: 1.3rem; color: var(--gold); }
-.waiting ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.waiting li button { all: unset; cursor: pointer; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; width: 100%; }
-.waiting li button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
-.waiting .age { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--gold); min-width: 4.5em; }
-.waiting .what { color: var(--ink-soft); font-style: italic; }
-
-.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); flex-wrap: wrap; }
-.tabs button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; color: var(--ink-soft); }
+/* ---------- toolbar ---------- */
+.bar { display: flex; gap: var(--sp-2) var(--sp-3); flex-wrap: wrap; align-items: center; }
+.tabs { --pad: 3px; display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-pill); padding: var(--pad); background: var(--card); flex-wrap: wrap; }
+.tabs button { border: 0; background: none; padding: 5px var(--sp-3); border-radius: var(--r-pill); color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; transition: background-color var(--t-med) var(--ease-inout), color var(--t-med) var(--ease-inout); }
 .tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.bar select, .bar input[type="search"] { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; min-width: 0; }
+.count { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold-bg); color: var(--gold); font-size: var(--fs-1); font-weight: 700; line-height: 1; }
+.tabs button[aria-pressed="true"] .count { background: var(--gold); color: var(--card); }
+.count:empty { display: none; }
+.bar select, .bar input[type="search"] { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 6px var(--sp-3); min-width: 0; }
 .bar input[type="search"] { flex: 1 1 180px; }
 .views { margin-left: auto; }
 
-.list { display: flex; flex-direction: column; gap: 16px; }
-.empty { text-align: center; padding: 48px 16px; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.empty h2 { font-size: 1.5rem; color: var(--ink); }
+/* ---------- lists ---------- */
+.list { display: flex; flex-direction: column; gap: var(--sp-4); }
+.empty { text-align: center; padding: var(--sp-7) var(--sp-4); color: var(--ink-soft); border: 1px dashed var(--line); border-radius: var(--r-lg); display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.empty svg { width: 72px; height: 72px; color: var(--ink-soft); }
+.empty h2 { font-size: var(--fs-5); color: var(--ink); }
 .empty p { margin: 0; max-width: 46ch; }
 
-.folio { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 24px; }
-.folio.flash { animation: flash 1.4s ease-out; }
-@keyframes flash { 0% { box-shadow: 0 0 0 3px var(--gold); } 100% { box-shadow: var(--shadow); } }
-.folio.finished { opacity: .82; }
-.fhead { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
-.fhead .main { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.fhead h3 { font-size: 1.45rem; line-height: 1.15; overflow-wrap: anywhere; }
-.meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: .9rem; color: var(--ink-soft); }
-.chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 1px 9px; border: 1px solid var(--line); background: var(--paper); font-size: .85rem; color: var(--ink); white-space: nowrap; }
+/* ---------- commission card ---------- */
+.folio { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: var(--sp-4) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); scroll-margin-top: var(--sp-5);
+  transition: opacity var(--t-med) var(--ease-inout), filter var(--t-med) var(--ease-inout); }
+.folio.finished { opacity: .85; }
+.fhead { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: flex-start; }
+.fhead .main { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+.fhead h3 { font-size: var(--fs-4); line-height: 1.15; }
+.meta { display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; font-size: var(--fs-2); color: var(--ink-soft); }
+.chip { display: inline-flex; align-items: center; gap: var(--sp-1); border-radius: var(--r-pill); padding: 1px 9px; border: 1px solid var(--line); background: var(--paper); font-size: var(--fs-2); color: var(--ink); white-space: nowrap; }
 button.chip { cursor: pointer; }
 .chip.repeat { border-color: var(--wash); color: var(--wash); }
 .chip.overdue { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
@@ -123,83 +172,142 @@ button.chip { cursor: pointer; }
 .chip.pay-unpaid { border-color: var(--danger); color: var(--danger); }
 .chip.pay-deposit { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
 .chip.pay-paid { border-color: var(--done); color: var(--done); background: var(--done-bg); }
+.chip.share { border-color: var(--wash); color: var(--wash); background: var(--wash-bg); }
 .fside { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.price { font-family: var(--display); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
-.progress { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--ink-soft); }
-.progress .track { flex: 1; height: 5px; background: var(--paper-2); border-radius: 999px; overflow: hidden; }
-.progress .fill { height: 100%; background: var(--done); border-radius: 999px; }
-.fnotes { margin: 0; font-size: .92rem; color: var(--ink-soft); white-space: pre-wrap; overflow-wrap: anywhere; }
+.price { font-size: var(--fs-4); font-weight: 500; }
+.price small { font-size: var(--fs-1); font-weight: 400; color: var(--ink-soft); }
+.payrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.fold { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; color: var(--ink-soft); margin-top: 1px; }
+.fold:hover { border-color: var(--ink-soft); color: var(--ink); }
+.fold .ico { width: 16px; height: 16px; margin-top: 1px; /* a down-chevron's weight sits low; nudge to look centred */ transition: transform var(--t-med) var(--ease-back); }
+.fold[aria-expanded="false"] .ico { transform: rotate(-90deg); margin: 0 0 0 1px; }
+.folio.dragging { outline: 2px dashed var(--wash); outline-offset: 4px; }
+.fbody { display: flex; flex-direction: column; gap: var(--sp-3); }
+.progress { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-2); color: var(--ink-soft); }
+.progress .track { flex: 1; height: 5px; background: var(--paper-2); border-radius: var(--r-pill); overflow: hidden; }
+.progress .fill { height: 100%; background: var(--done); border-radius: var(--r-pill); transition: width var(--t-slow) var(--ease-inout); }
+.fnotes { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); white-space: pre-wrap; overflow-wrap: anywhere; }
 
-.pieces { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
-.piece { display: grid; grid-template-columns: minmax(150px, 1fr) auto auto; gap: 8px 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+/* pieces are grouped by space, not rules */
+.pieces { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.piece { --pad: var(--sp-2); display: grid; grid-template-columns: minmax(140px, 1fr) auto auto; gap: var(--sp-1) var(--sp-3); align-items: center; padding: var(--pad); margin-inline: calc(var(--pad) * -1); border-radius: var(--r-md); transition: background-color var(--t-med) var(--ease-inout); }
+.piece:hover, .piece.staged { background: var(--paper); }
 .pname { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .pname b { font-weight: 500; overflow-wrap: anywhere; }
-.pname .now { font-size: .85rem; color: var(--ink-soft); }
-.pname .now.wait { color: var(--gold); font-style: italic; }
+.pname .now { font-size: var(--fs-2); color: var(--ink-soft); }
+.pname .now.wait { color: var(--gold); }
 .steps { display: flex; gap: 6px; flex-wrap: wrap; }
 .step {
-  display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px 3px 4px;
-  border: 1px solid var(--line); background: var(--paper); font-size: .88rem; color: var(--ink-soft);
+  display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r-pill); padding: 3px 10px 3px 4px;
+  border: 1px solid var(--line); background: var(--paper); font-size: var(--fs-2); color: var(--ink-soft);
+  transition: background-color var(--t-med) var(--ease-inout), border-color var(--t-med) var(--ease-inout), color var(--t-med) var(--ease-inout);
 }
-.step svg { width: 20px; height: 20px; flex: none; }
+.step svg { width: 20px; height: 20px; flex: none; transition: transform var(--t-fast) var(--ease-out); }
 .step[data-status="doing"] { border-color: var(--wash); background: var(--wash-bg); color: var(--ink); }
 .step[data-status="waiting"] { border-color: var(--gold); background: var(--gold-bg); color: var(--ink); border-style: dashed; }
 .step[data-status="done"] { border-color: var(--done); background: var(--done-bg); color: var(--done); }
 .step:hover { border-color: var(--ink-soft); }
 .pacts { display: flex; gap: 2px; }
-.ffoot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.ffoot { display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; justify-content: space-between; padding-top: var(--sp-1); }
 
-.clients { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-.client { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.client h3 { font-size: 1.3rem; overflow-wrap: anywhere; }
-.client .contact { font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; user-select: all; }
-.client p { margin: 0; font-size: .92rem; color: var(--ink-soft); white-space: pre-wrap; overflow-wrap: anywhere; }
-.client .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+/* finished seal */
+.stamp { position: absolute; left: calc(50% - 44px); bottom: var(--sp-2); width: 88px; height: 88px; color: var(--done); opacity: .2; transform: rotate(-12deg); pointer-events: none; }
+.stamp text { font-family: var(--body); font-weight: 700; }
 
+/* files */
+.files { display: flex; flex-direction: column; gap: var(--sp-2); }
+.files-head { display: flex; gap: var(--sp-2); align-items: center; font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+.files-head .up { text-transform: none; letter-spacing: 0; color: var(--wash); font-size: var(--fs-2); display: inline-flex; align-items: center; gap: var(--sp-2); }
+.upbar { width: 80px; height: 4px; border-radius: var(--r-pill); background: var(--wash-bg); overflow: hidden; }
+.upbar i { display: block; height: 100%; background: var(--wash); transition: width var(--t-med) var(--ease-out); }
+.file-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
+.file { --r: var(--r-md); --pad: var(--sp-2); border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); padding: var(--pad); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.thumb { all: unset; cursor: pointer; aspect-ratio: 4 / 3; border-radius: calc(var(--r) - var(--pad)); display: grid; place-items: center; overflow: hidden; color: var(--ink-soft); font-size: var(--fs-1);
+  background-color: var(--paper-2);
+  background-image: linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%), linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%);
+  background-size: 14px 14px; background-position: 0 0, 7px 7px; }
+.thumb.loading, .preview.loading { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--card) 70%, transparent) 50%, transparent 70%); background-size: 250% 100%; background-position: 100% 0; animation: shimmer 1.3s var(--ease-inout) infinite; }
+.thumb:focus-visible { outline: 2px solid var(--wash); outline-offset: 2px; }
+.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.thumb img:not([src]) { visibility: hidden; }
+.fmeta { display: flex; flex-direction: column; min-width: 0; font-size: var(--fs-2); }
+.fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fsize { color: var(--ink-soft); font-size: var(--fs-1); }
+.facts { display: flex; gap: 2px; flex-wrap: wrap; margin-left: calc(var(--sp-1) * -1); /* line link text up with the file name */ }
+.preview { max-width: 100%; min-height: 200px; max-height: 60vh; object-fit: contain; border-radius: var(--r-sm); background-color: var(--paper-2); display: block; margin: 0 auto; }
+
+/* ---------- clients ---------- */
+.clients { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-4); }
+.client { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.client h3 { font-size: var(--fs-4); }
+.client .contact { font-size: var(--fs-2); color: var(--ink-soft); overflow-wrap: anywhere; user-select: all; }
+.client p { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); white-space: pre-wrap; overflow-wrap: anywhere; }
+.client .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: var(--sp-2); }
+
+/* ---------- step menu ---------- */
 .pop {
-  position: absolute; z-index: 30; width: 260px; background: var(--card); border: 1px solid var(--ink-soft); border-radius: 12px;
-  box-shadow: 0 16px 40px -12px rgba(0,0,0,.45); padding: 10px; display: flex; flex-direction: column; gap: 6px;
+  --r: var(--r-lg); --pad: var(--sp-2);
+  position: absolute; z-index: 30; width: 270px; background: var(--card); border: 1px solid var(--ink-soft); border-radius: var(--r);
+  box-shadow: var(--shadow-pop); padding: var(--pad); display: flex; flex-direction: column; gap: 2px;
 }
-.pop .ph { font-family: var(--display); font-size: 1.1rem; padding: 0 4px 2px; }
-.pop .opt { display: flex; align-items: center; gap: 8px; border: 1px solid transparent; background: none; border-radius: 8px; padding: 6px; text-align: left; }
+.pop .ph { font-family: var(--display); font-size: 1.1rem; padding: var(--sp-1) var(--sp-2) var(--sp-1); }
+.pop .opt { display: flex; align-items: center; gap: var(--sp-2); border: 1px solid transparent; background: none; border-radius: calc(var(--r) - var(--pad)); padding: 6px var(--sp-2); text-align: left; }
 .pop .opt:hover { background: var(--paper-2); }
 .pop .opt[aria-pressed="true"] { border-color: var(--ink-soft); background: var(--paper); }
 .pop .opt svg { width: 20px; height: 20px; }
-.pop label { font-size: .82rem; color: var(--ink-soft); padding: 4px 4px 0; }
-.pop .noterow { display: flex; gap: 6px; }
-.pop input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 6px 8px; }
+.pop .opt.all { color: var(--done); border-top: 0; margin-top: var(--sp-1); }
+.pop .opt.all .ico { width: 20px; height: 20px; }
+.pop label { font-size: var(--fs-1); color: var(--ink-soft); padding: var(--sp-2) var(--sp-2) 0; }
+.pop .noterow { display: flex; gap: 6px; padding: 2px; }
+.pop input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--paper); border-radius: var(--r-sm); padding: 6px var(--sp-2); }
 
-dialog { border: 1px solid var(--ink-soft); border-radius: 16px; background: var(--card); color: var(--ink); padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
-dialog::backdrop { background: rgba(19,24,41,.45); }
-dialog form { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-dialog h2 { font-size: 1.6rem; }
+/* staging: while a step menu is open, the card it belongs to holds focus */
+.list.staging .folio:not(.staged) { opacity: .45; filter: saturate(.6); }
+
+/* ---------- dialogs ---------- */
+dialog { border: 1px solid var(--ink-soft); border-radius: var(--r-lg); background: var(--card); color: var(--ink); padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
+dialog.wide { width: min(900px, calc(100vw - 32px)); }
+dialog::backdrop { background: var(--scrim); }
+dialog form { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+dialog h2 { font-size: var(--fs-5); line-height: 1.15; }
 dialog ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
-dialog .hint { margin: 0; font-size: .88rem; color: var(--ink-soft); }
-.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.field > span { font-size: .85rem; color: var(--ink-soft); }
-.field small { color: var(--ink-soft); font-size: .8rem; }
-.field input, .field select, .field textarea { border: 1px solid var(--line); background: var(--paper); border-radius: 10px; padding: 8px 10px; width: 100%; }
+dialog .hint { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); }
+.field { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.field > span { font-size: var(--fs-2); color: var(--ink-soft); }
+.field small { color: var(--ink-soft); font-size: var(--fs-1); }
+.field input, .field select, .field textarea { border: 1px solid var(--line); background: var(--paper); border-radius: var(--r-md); padding: var(--sp-2) 10px; width: 100%; }
+.field input.mono { font-family: var(--mono); font-size: var(--fs-2); }
 .field textarea { min-height: 84px; resize: vertical; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-.dfoot { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; align-items: center; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-3); }
+.dfoot { display: flex; gap: var(--sp-2); justify-content: flex-end; flex-wrap: wrap; align-items: center; padding-top: var(--sp-2); }
 .dfoot .spacer { flex: 1; }
-.err { color: var(--danger); font-size: .88rem; margin: 0; }
+.err { color: var(--danger); font-size: var(--fs-2); margin: 0; }
 
-.foot { display: flex; gap: 10px 18px; flex-wrap: wrap; align-items: center; justify-content: space-between; color: var(--ink-soft); font-size: .88rem; border-top: 1px solid var(--line); padding-top: 14px; }
+/* ---------- footer ---------- */
+.foot { display: flex; gap: 10px 18px; flex-wrap: wrap; align-items: center; justify-content: space-between; color: var(--ink-soft); font-size: var(--fs-2); border-top: 1px solid var(--line); padding-top: var(--sp-4); }
 .foot label { display: inline-flex; gap: 6px; align-items: center; }
-.foot input { width: 4.5em; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 3px 8px; }
-.sync { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.foot input { width: 4.5em; border: 1px solid var(--line); background: var(--card); border-radius: var(--r-sm); padding: 3px var(--sp-2); }
+.sync { display: inline-flex; gap: var(--sp-2); align-items: center; flex-wrap: wrap; }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-soft); flex: none; }
 .dot.ok { background: var(--done); }
 .dot.saving { background: var(--wash); }
 .dot.error { background: var(--danger); }
 .dot.off { background: transparent; border: 1px solid var(--ink-soft); }
-.notice { background: var(--danger-bg); color: var(--danger); border-radius: 12px; padding: 12px 14px; }
+.notice { background: var(--danger-bg); color: var(--danger); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); }
 .notice.ok { background: var(--done-bg); color: var(--done); }
+
+/* effects layer */
+.spark { position: fixed; z-index: 60; left: 0; top: 0; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); background: var(--c); pointer-events: none;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); will-change: transform, opacity; }
+.spark.round { clip-path: none; border-radius: 50%; }
+.ripple { position: fixed; z-index: 60; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid var(--c); pointer-events: none; animation: ripple .7s var(--ease-out) forwards; }
+.token { position: fixed; z-index: 61; left: 0; top: 0; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; background: var(--gold-bg); border: 1.5px dashed var(--gold); color: var(--gold); display: grid; place-items: center; pointer-events: none; will-change: transform; }
+.token .ico { width: 16px; height: 16px; }
 
 @media (max-width: 760px) {
   .seals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .seals .seal:last-child { grid-column: 1 / -1; }
   .piece { grid-template-columns: 1fr auto; }
   .piece .steps { grid-column: 1 / -1; grid-row: 2; }
   .fside { align-items: flex-start; }
@@ -208,131 +316,121 @@ dialog .hint { margin: 0; font-size: .88rem; color: var(--ink-soft); }
 @media (max-width: 460px) {
   .grid2, .grid3 { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { .folio.flash { animation: none; } }
-</style>
-<style>
-.fold { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; color: var(--ink-soft); margin-top: 2px; }
-.fold:hover { border-color: var(--ink-soft); color: var(--ink); }
-.fold svg { width: 16px; height: 16px; transition: transform .15s ease; }
-.fold[aria-expanded="false"] svg { transform: rotate(-90deg); }
-.folio.collapsed { padding-bottom: 18px; }
-.folio.dragging { outline: 2px dashed var(--wash); outline-offset: 4px; }
-.price small { font-family: var(--body); font-size: .8rem; color: var(--ink-soft); }
-.payrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-.chip.share { border-color: var(--wash); color: var(--wash); background: var(--wash-bg); }
-.seal .v.multi { font-size: 1.5rem; line-height: 1.2; }
 
-.files { display: flex; flex-direction: column; gap: 8px; }
-.files-head { display: flex; gap: 8px; align-items: baseline; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
-.files-head .up { text-transform: none; letter-spacing: 0; color: var(--wash); font-size: .85rem; }
-.file-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.file { border: 1px solid var(--line); border-radius: 12px; background: var(--paper); padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.thumb { all: unset; cursor: pointer; aspect-ratio: 4 / 3; border-radius: 8px; display: grid; place-items: center; overflow: hidden; color: var(--ink-soft); font-size: .8rem;
-  background-color: var(--paper-2);
-  background-image: linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%), linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%);
-  background-size: 14px 14px; background-position: 0 0, 7px 7px; }
-.thumb:focus-visible { outline: 2px solid var(--wash); outline-offset: 2px; }
-.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: auto; }
-.fmeta { display: flex; flex-direction: column; min-width: 0; font-size: .85rem; }
-.fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fsize { color: var(--ink-soft); font-size: .78rem; font-variant-numeric: tabular-nums; }
-.facts { display: flex; gap: 2px; flex-wrap: wrap; }
-.link.armed { color: var(--danger); font-weight: 700; }
-.preview { max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px; background: var(--paper-2); display: block; margin: 0 auto; }
-dialog.wide { width: min(900px, calc(100vw - 32px)); }
-</style>
-<style>
-/* Atmosphere: paper grain, watercolour washes, drifting gold dust, a slow-turning circle; ink that draws itself. */
+/* ---------- motion ----------
+   Squash & stretch: presses and arrivals deform, then recover.
+   Anticipation: a wind-up pose before every big change.
+   Staging: the step menu dims the other cards; ambient motion pauses.
+   Pose to pose: keyframes are named key poses (wind-up, launch, impact, overshoot, rest).
+   Follow-through: overshoot on settle; sparks keep travelling after the hit.
+   Slow in, slow out: every transition uses an ease token, never linear (except constant rotation).
+   Arcs: sparks and the waiting token travel on curved paths, not straight lines. */
+@media (prefers-reduced-motion: no-preference) {
+  .sigil .ink { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-inout) forwards; }
+  .sigil .ink:nth-of-type(2) { animation-delay: .2s; }
+  .sigil .ink:nth-of-type(3) { animation-delay: .45s; }
+  .sigil .hat { transform-box: fill-box; transform-origin: 50% 100%; animation: hat-land .9s 1s var(--ease-out) backwards; }
+  .halo { animation: spin 240s linear infinite; }
+  body.staging .halo { animation-play-state: paused; }
+  .title h1 { animation: ink-reveal 1.1s .2s var(--ease-inout) backwards; }
+  .seal.enter, .folio.enter, .client.enter, .file.enter { animation: unfurl var(--t-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 60ms); }
+  .fbody.unfolding { animation: unfold var(--t-med) var(--ease-out) backwards; }
+  .fbody.folding { animation: fold 170ms var(--ease-in) forwards; }
+
+  /* squash on press, stretch back on release */
+  .step:active svg { transform: scale(1.18, .8); transition-duration: 60ms; }
+  .step[data-status="doing"] svg .orbit { transform-box: view-box; transform-origin: 10px 10px; animation: spin 7s linear infinite; }
+  .step[data-status="waiting"] svg .glass { transform-box: fill-box; transform-origin: center; animation: sway 2.6s var(--ease-inout) infinite; }
+  .step.just-done svg { animation: tick-done .62s var(--d, 0ms) both; }
+  .step.just-done svg .ink { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw .36s calc(var(--d, 0ms) + 160ms) var(--ease-inout) forwards; }
+  .step.just-done svg .star { transform-box: fill-box; transform-origin: center; animation: star-pop .5s calc(var(--d, 0ms) + 300ms) var(--ease-back) backwards; }
+  .step.just-doing svg, .step.just-waiting svg, .step.just-todo svg { animation: tick-small .45s var(--d, 0ms) both; }
+  .count.tick { animation: count-tick .5s both; }
+  .chip.flip { animation: flip .42s var(--ease-back) both; }
+  .pop { animation: conjure var(--t-med) var(--ease-out) both; transform-origin: 24px 0; }
+  dialog[open] { animation: conjure .3s var(--ease-out) both; }
+  dialog[open]::backdrop { animation: fade .3s var(--ease-inout) both; }
+  .dot.saving { animation: pulse 1.2s var(--ease-inout) infinite; }
+  .stamp.stamping { animation: stamp .9s both, settle 1.2s 2.4s var(--ease-inout) forwards; }
+}
+@keyframes ink-draw { to { stroke-dashoffset: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes sway { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+@keyframes ink-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes hat-land {
+  0%   { opacity: 0; transform: translateY(-14px) scale(.9, 1.15); animation-timing-function: var(--ease-in); }  /* falling, stretched */
+  55%  { opacity: 1; transform: translateY(0) scale(1.18, .8); animation-timing-function: var(--ease-out); }   /* impact: squash */
+  80%  { transform: translateY(-2px) scale(.96, 1.05); animation-timing-function: var(--ease-inout); }         /* rebound */
+  100% { transform: none; }
+}
+@keyframes unfurl { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes unfold { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes fold { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes tick-done {
+  0%   { transform: none; animation-timing-function: var(--ease-out); }
+  22%  { transform: scale(.72, .84) rotate(-24deg); animation-timing-function: var(--ease-in); }  /* wind-up */
+  48%  { transform: scale(.86, 1.3) rotate(6deg); animation-timing-function: var(--ease-out); }    /* launch: stretch */
+  66%  { transform: scale(1.3, .82) rotate(0); animation-timing-function: var(--ease-out); }       /* impact: squash */
+  84%  { transform: scale(.95, 1.06); animation-timing-function: var(--ease-inout); }             /* follow-through */
+  100% { transform: none; }
+}
+@keyframes tick-small {
+  0%   { transform: none; animation-timing-function: var(--ease-out); }
+  30%  { transform: scale(.8) rotate(-14deg); animation-timing-function: var(--ease-in); }
+  65%  { transform: scale(1.15, .9); animation-timing-function: var(--ease-out); }
+  100% { transform: none; }
+}
+@keyframes star-pop { from { opacity: 0; transform: scale(0) rotate(-90deg); } to { opacity: 1; transform: none; } }
+@keyframes count-tick {
+  0%   { transform: none; animation-timing-function: var(--ease-in); }
+  30%  { transform: scale(1.4, .7); animation-timing-function: var(--ease-out); }
+  60%  { transform: scale(.88, 1.18); animation-timing-function: var(--ease-inout); }
+  100% { transform: none; }
+}
+@keyframes flip { from { transform: perspective(200px) rotateX(85deg); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes conjure { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pulse { 50% { opacity: .35; } }
+@keyframes shimmer { to { background-position: -150% 0; } }
+@keyframes stamp {
+  0%   { opacity: 0; transform: translateY(-10px) scale(1.5) rotate(-30deg); animation-timing-function: var(--ease-out); }
+  30%  { opacity: .6; transform: translateY(-22px) scale(1.7) rotate(-34deg); animation-timing-function: var(--ease-in); }  /* wind-up: lifts */
+  55%  { opacity: .95; transform: scale(1.08, .86) rotate(-11deg); animation-timing-function: var(--ease-out); }         /* slam: squash */
+  75%  { transform: scale(.97, 1.04) rotate(-13deg); animation-timing-function: var(--ease-inout); }                      /* rebound */
+  100% { opacity: .9; transform: rotate(-12deg); }
+}
+@keyframes settle { to { opacity: .2; } }
+@keyframes ripple { from { opacity: .7; transform: scale(.4); } to { opacity: 0; transform: scale(3.4); } }
+
+/* ---------- embellishments ---------- */
 :root { --mote: 168,118,38; }
 @media (prefers-color-scheme: dark) { :root { --mote: 232,205,140; } }
-body {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-    radial-gradient(60rem 30rem at 0% -10%, var(--wash-bg), transparent 70%),
-    radial-gradient(50rem 30rem at 105% 10%, var(--gold-bg), transparent 65%);
-  background-attachment: fixed;
-}
 #motes { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-.halo { position: fixed; width: 640px; height: 640px; top: -230px; right: -240px; color: var(--gold); opacity: .13; pointer-events: none; z-index: 0; transform-origin: center; }
-.wrap { position: relative; z-index: 1; }
-.sigil .orbit, .sigil .glint { transform-box: fill-box; transform-origin: center; }
-.flourish { display: flex; justify-content: center; color: var(--gold); margin-top: -10px; }
+.flourish { display: flex; justify-content: center; color: var(--gold); margin-top: calc(var(--sp-3) * -1); }
 .flourish svg { width: 260px; max-width: 100%; height: 18px; overflow: visible; }
-.waiting h2 { display: flex; gap: 8px; align-items: center; }
-.hourglass { width: 22px; height: 22px; flex: none; transform-origin: center; }
-
-.folio { position: relative; transition: transform .25s ease, box-shadow .25s ease; }
-.folio:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(28,36,64,.06), 0 18px 34px -20px rgba(28,36,64,.5); }
 .folio::before, .folio::after {
   content: ''; position: absolute; width: 38px; height: 38px; background: var(--gold); opacity: .55; pointer-events: none;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='black' stroke-linecap='round'%3E%3Cpath d='M2 38V14Q2 2 14 2h24' stroke-width='1.6'/%3E%3Cpath d='M7 30V16q0-9 9-9h14' stroke-width='.9'/%3E%3Ccircle cx='7' cy='35' r='1.6' fill='black' stroke='none'/%3E%3Ccircle cx='35' cy='7' r='1.6' fill='black' stroke='none'/%3E%3Cpath d='M13 13l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z' fill='black' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='black' stroke-linecap='round'%3E%3Cpath d='M2 38V14Q2 2 14 2h24' stroke-width='1.6'/%3E%3Cpath d='M7 30V16q0-9 9-9h14' stroke-width='.9'/%3E%3Ccircle cx='7' cy='35' r='1.6' fill='black' stroke='none'/%3E%3Ccircle cx='35' cy='7' r='1.6' fill='black' stroke='none'/%3E%3Cpath d='M13 13l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z' fill='black' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 .folio::before { top: 6px; left: 6px; }
 .folio::after { bottom: 6px; right: 6px; transform: rotate(180deg); }
-.stamp { position: absolute; left: calc(50% - 44px); bottom: 6px; width: 88px; height: 88px; color: var(--done); opacity: .2; transform: rotate(-12deg); pointer-events: none; }
-.stamp text { font-family: var(--display); }
-
+.folio:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(28,36,64,.06), 0 18px 34px -20px rgba(28,36,64,.5); }
+.folio { transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out), opacity var(--t-med) var(--ease-inout), filter var(--t-med) var(--ease-inout); }
 dialog form { position: relative; overflow: hidden; isolation: isolate; }
 dialog form::before {
   content: ''; position: absolute; z-index: -1; width: 260px; height: 260px; right: -90px; top: -90px; background: var(--gold); opacity: .1; pointer-events: none;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='black'%3E%3Ccircle cx='100' cy='100' r='95' stroke-width='2'/%3E%3Ccircle cx='100' cy='100' r='88' stroke-width='5' stroke-dasharray='1 10'/%3E%3Ccircle cx='100' cy='100' r='60' stroke-width='1.5'/%3E%3Cpath d='M100 40l52 90H48zM100 160L48 70h104z' stroke-width='1.5'/%3E%3Ccircle cx='100' cy='100' r='22' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='black'%3E%3Ccircle cx='100' cy='100' r='95' stroke-width='2'/%3E%3Ccircle cx='100' cy='100' r='88' stroke-width='5' stroke-dasharray='1 10'/%3E%3Ccircle cx='100' cy='100' r='60' stroke-width='1.5'/%3E%3Cpath d='M100 40l52 90H48zM100 160L48 70h104z' stroke-width='1.5'/%3E%3Ccircle cx='100' cy='100' r='22' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat center / contain;
 }
-.btn { position: relative; overflow: hidden; }
-.btn::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.32), transparent); transform: translateX(-120%) skewX(-20deg); pointer-events: none; }
-
-.spark { position: fixed; z-index: 60; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); background: var(--c); pointer-events: none;
-  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); animation: fly var(--t) cubic-bezier(.15,.7,.3,1) forwards; }
-.spark.dot { clip-path: none; border-radius: 50%; }
-.ripple { position: fixed; z-index: 60; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid var(--c); pointer-events: none; animation: ripple .7s ease-out forwards; }
-
+.btn { overflow: hidden; }
+.btn:not(.busy)::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.32), transparent); transform: translateX(-120%) skewX(-20deg); pointer-events: none; }
+.seal { transition: transform var(--t-med) var(--ease-out); }
 @media (prefers-reduced-motion: no-preference) {
-  .sigil .ink { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.5s cubic-bezier(.6,.1,.3,1) forwards; }
-  .sigil .ink:nth-of-type(2) { animation-delay: .25s; }
-  .sigil .ink:nth-of-type(3) { animation-delay: .5s; }
-  .sigil .glint { animation: glint .7s 1.1s cubic-bezier(.3,1.6,.5,1) backwards; }
-  .sigil .glint.moon { animation-delay: 1.3s; }
-  .sigil .orbit { animation: spin 40s linear infinite; }
-  .halo { animation: spin 240s linear infinite; }
-  .title h1 { animation: ink-reveal 1.2s .2s cubic-bezier(.6,.1,.2,1) backwards; }
-  .title p { animation: rise .8s .8s ease backwards; }
-  .flourish .line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.1s .7s ease forwards; }
-  .flourish .gem { transform-box: fill-box; transform-origin: center; animation: glint .6s 1.5s cubic-bezier(.3,1.6,.5,1) backwards; }
-  .hourglass { animation: sway 2.6s ease-in-out infinite; }
-  .seal.enter, .folio.enter, .client.enter, .file.enter { animation: unfurl .6s cubic-bezier(.2,.75,.25,1) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
-  .fbody.unfolding { animation: unfold .35s ease backwards; }
-  .fbody.folding { animation: fold .17s ease forwards; }
-  .step { transition: background-color .3s, border-color .3s, color .3s, transform .2s; }
-  .step:hover { transform: translateY(-1px); }
-  .step:active { transform: scale(.96); }
-  .step[data-status="doing"] svg { animation: spin 7s linear infinite; }
-  .step[data-status="waiting"] svg { animation: sway 2.6s ease-in-out infinite; }
-  .step.just-done svg, .step.just-todo svg { animation: pop .55s cubic-bezier(.3,1.7,.5,1); }
-  .step.just-doing svg { animation: pop .55s cubic-bezier(.3,1.7,.5,1), spin 7s .55s linear infinite; }
-  .step.just-waiting svg { animation: pop .55s cubic-bezier(.3,1.7,.5,1), sway 2.6s .55s ease-in-out infinite; }
-  .seal { transition: transform .25s ease; }
+  .flourish .line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.1s .7s var(--ease-inout) forwards; }
+  .flourish .gem { transform-box: fill-box; transform-origin: center; animation: star-pop .6s 1.5s var(--ease-back) backwards; }
   .seal:hover { transform: translateY(-2px) rotate(-.4deg); }
-  .pop { animation: conjure .18s ease-out both; transform-origin: 20px 0; }
-  dialog[open] { animation: conjure .28s ease-out both; }
-  dialog[open]::backdrop { animation: fade .3s ease both; }
   dialog form::before { animation: spin 90s linear infinite; }
-  .btn:hover::after { animation: sheen .8s ease; }
-  .stamp.stamping { animation: stamp .75s cubic-bezier(.2,1.4,.4,1) both, settle 1.2s 2.4s ease forwards; }
+  .btn:hover:not(.busy)::after { animation: sheen .8s var(--ease-inout); }
 }
-@keyframes ink-draw { to { stroke-dashoffset: 0; } }
-@keyframes glint { from { opacity: 0; transform: scale(.3) rotate(-40deg); } to { opacity: 1; transform: none; } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes ink-reveal { from { clip-path: inset(0 100% 0 0); filter: blur(3px); } to { clip-path: inset(0 0 0 0); filter: none; } }
-@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes unfurl { from { opacity: 0; transform: translateY(16px) rotate(-.6deg) scale(.985); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
-@keyframes unfold { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-@keyframes fold { to { opacity: 0; transform: translateY(-6px); } }
-@keyframes sway { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
-@keyframes pop { 0% { transform: scale(.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
-@keyframes conjure { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
-@keyframes fade { from { opacity: 0; } }
-@keyframes stamp { 0% { opacity: 0; transform: scale(2.6) rotate(-40deg); } 60% { opacity: .95; transform: scale(.9) rotate(-10deg); } 80% { transform: scale(1.05) rotate(-13deg); } 100% { opacity: .9; transform: scale(1) rotate(-12deg); } }
-@keyframes settle { to { opacity: .2; } }
-@keyframes fly { 0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)) scale(.3); } }
-@keyframes ripple { from { opacity: .7; transform: scale(.4); } to { opacity: 0; transform: scale(3.4); } }
 @keyframes sheen { from { transform: translateX(-120%) skewX(-20deg); } to { transform: translateX(260%) skewX(-20deg); } }
 </style>
 </head>
@@ -351,21 +449,21 @@ dialog form::before {
 </svg>
 <div class="wrap">
   <header class="top">
-    <svg class="sigil" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round">
-      <circle class="ink" pathLength="1" cx="32" cy="32" r="29" stroke-width="1.2"/>
-      <g class="orbit"><circle cx="32" cy="32" r="24.5" stroke-width=".8" stroke-dasharray="1.5 3.2"/></g>
-      <circle class="ink" pathLength="1" cx="32" cy="32" r="13" stroke-width="1.2"/>
-      <path class="ink" pathLength="1" d="M32 3v6M32 55v6M3 32h6M55 32h6" stroke-width="1.2"/>
-      <path class="glint" d="M32 21l2.6 8.4L43 32l-8.4 2.6L32 43l-2.6-8.4L21 32l8.4-2.6z" fill="currentColor" stroke="none"/>
-      <path class="glint moon" d="M46.5 14.5a6 6 0 1 0 3 9.5 4.6 4.6 0 1 1-3-9.5z" fill="currentColor" stroke="none"/>
+    <svg class="sigil" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <circle class="ink" pathLength="1" cx="32" cy="32" r="29" stroke-width="1.5"/>
+      <circle class="ink" pathLength="1" cx="32" cy="32" r="24" stroke-width="1" stroke-dasharray="1.5 3.2"/>
+      <path class="ink" pathLength="1" d="M32 3v5M32 56v5M3 32h5M56 32h5" stroke-width="1.5"/>
+      <g class="hat">
+        <path d="M33 13c-3 9-7 16-14 23h26c-5-6-8-14-12-23z" fill="currentColor" stroke-width="1.5"/>
+        <path d="M14 40c9-3.5 27-3.5 36 0" stroke-width="2.4"/>
+        <path d="M24 33.5c5 1.4 11 1.4 16 0" stroke="var(--paper)" stroke-width="1.5"/>
+        <path d="M42 19l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="currentColor" stroke="none"/>
+      </g>
     </svg>
-    <div class="title">
-      <h1>Atelier Ledger</h1>
-      <p>Every commission, every piece, and the step each one is on.</p>
-    </div>
+    <div class="title"><h1>Atelier Ledger</h1></div>
     <div class="actions">
-      <button class="btn" id="new-commission" type="button">+ New commission</button>
-      <button class="btn ghost" id="new-client" type="button">+ Client</button>
+      <button class="btn" id="new-commission" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>New commission</button>
+      <button class="btn ghost" id="new-client" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>Client</button>
     </div>
   </header>
 
@@ -375,15 +473,10 @@ dialog form::before {
 
   <section class="seals" id="seals" aria-label="Summary"></section>
 
-  <section class="waiting" id="waiting" hidden>
-    <h2><svg class="hourglass" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h10M5 17h10M6 3.5c0 4 8 4 8 13M14 3.5c0 4-8 4-8 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Waiting on clients</h2>
-    <ul id="waiting-list"></ul>
-  </section>
-
   <div class="bar">
     <div class="tabs" role="group" aria-label="Show commissions" id="filters">
       <button type="button" data-filter="active" aria-pressed="true">In the works</button>
-      <button type="button" data-filter="waiting" aria-pressed="false">Waiting</button>
+      <button type="button" data-filter="waiting" aria-pressed="false">Waiting <span class="count" id="wait-count" aria-label="pieces waiting"></span></button>
       <button type="button" data-filter="finished" aria-pressed="false">Finished</button>
       <button type="button" data-filter="all" aria-pressed="false">All</button>
     </div>
@@ -459,15 +552,23 @@ dialog form::before {
 
   function ring(status) {
     const c = { todo: 'var(--ink-soft)', doing: 'var(--wash)', waiting: 'var(--gold)', done: 'var(--done)' }[status] || 'var(--ink-soft)';
-    if (status === 'done') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="${c}"/><path d="M10 5.2l1.3 3.5 3.5 1.3-3.5 1.3L10 14.8l-1.3-3.5L5.2 10l3.5-1.3z" fill="var(--card)"/></svg>`;
-    if (status === 'doing') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="${c}"/></svg>`;
-    if (status === 'waiting') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="${c}" stroke-width="1.5" stroke-dasharray="2.2 2.2"/><path d="M7 6h6M7 14h6M7.6 6.3c0 2.3 4.8 2.3 4.8 7.4M12.4 6.3c0 2.3-4.8 2.3-4.8 7.4" fill="none" stroke="${c}" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+    if (status === 'done') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle class="ink" pathLength="1" cx="10" cy="10" r="8.25" fill="none" stroke="${c}" stroke-width="1.5" transform="rotate(-90 10 10)"/><circle cx="10" cy="10" r="6" fill="${c}"/><path class="star" d="M10 5.6l1.15 3.25L14.4 10l-3.25 1.15L10 14.4l-1.15-3.25L5.6 10l3.25-1.15z" fill="var(--card)"/></svg>`;
+    if (status === 'doing') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M10 4.5a5.5 5.5 0 0 1 0 11z" fill="${c}"/><g class="orbit"><circle cx="10" cy="2.5" r="1.6" fill="${c}"/></g></svg>`;
+    if (status === 'waiting') return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="${c}" stroke-width="1.5" stroke-dasharray="2.2 2.2"/><path class="glass" d="M7 6h6M7 14h6M7.6 6.3c0 2.3 4.8 2.3 4.8 7.4M12.4 6.3c0 2.3-4.8 2.3-4.8 7.4" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/></svg>`;
     return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
   }
-  const CHEVRON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  /* One icon set: 20px grid, 1.5 stroke, round caps (see .ico). */
+  const I = (d) => `<svg class="ico" viewBox="0 0 20 20" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    plus: I('<path d="M10 4v12M4 10h12"/>'),
+    chevron: I('<path d="M5.5 8l4.5 4.5L14.5 8"/>'),
+    glass: I('<path d="M6 3.5h8M6 16.5h8M7 4c0 4 6 4 6 12M13 4c0 4-6 4-6 12"/>'),
+    stars: I('<path d="M8 3l1.3 3.7L13 8l-3.7 1.3L8 13l-1.3-3.7L3 8l3.7-1.3z"/><path d="M14.5 11.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
+  };
+  const INKPOT = `<svg viewBox="0 0 72 72" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 36h30l3 6v16a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V42z"/><path d="M27 36v-6h18v6"/><path d="M22 48h28"/><path d="M60 6C48 12 40 24 36 41"/><path d="M60 6c-1 10-8 20-20 26"/><path d="M58 46l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="currentColor" stroke="none"/><path d="M10 16l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor" stroke="none"/></svg>`;
 
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
-  const fx = { step: null, finished: null, unfold: null, newFiles: new Set() };
+  const fx = { steps: [], finished: null, unfold: null, pay: null, newFiles: new Set() };
   const seenCards = new Set();
   const linger = new Set();
   const stampStart = new Map();
@@ -475,19 +576,49 @@ dialog form::before {
   const FX_COLORS = { todo: 'var(--ink-soft)', doing: 'var(--wash)', waiting: 'var(--gold)', done: 'var(--done)' };
 
   function burst(x, y, count, opts = {}) {
-    if (calm.matches) return;
+    if (calm.matches || !document.body.animate) return;
     const colors = opts.colors || ['var(--gold)', 'var(--wash)', 'var(--done)'];
     for (let k = 0; k < count; k++) {
       const el = document.createElement('span');
-      el.className = 'spark' + (opts.dots || Math.random() < 0.3 ? ' dot' : '');
+      el.className = 'spark' + (opts.dots || Math.random() < 0.3 ? ' round' : '');
       el.setAttribute('aria-hidden', 'true');
-      const ang = Math.random() * Math.PI * 2;
-      const dist = (opts.far ? 70 : 26) + Math.random() * (opts.far ? 90 : 40);
-      const size = (opts.far ? 7 : 5) + Math.random() * (opts.far ? 9 : 6);
-      el.style.cssText = `left:${x}px;top:${y}px;--s:${size}px;--dx:${Math.cos(ang) * dist}px;--dy:${Math.sin(ang) * dist - (opts.far ? 30 : 10)}px;--r:${(Math.random() - 0.5) * 360}deg;--t:${600 + Math.random() * 500}ms;--c:${colors[k % colors.length]}`;
-      el.addEventListener('animationend', () => el.remove());
+      const size = (opts.far ? 7 : 5) + Math.random() * (opts.far ? 8 : 5);
+      el.style.cssText = `--s:${size}px;--c:${colors[k % colors.length]}`;
       document.body.appendChild(el);
+      // launched upward and outward, then gravity bends the path into an arc
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3;
+      const speed = (opts.far ? 160 : 80) + Math.random() * (opts.far ? 110 : 50);
+      const vx = Math.cos(ang) * speed, vy = Math.sin(ang) * speed, g = opts.far ? 460 : 300;
+      const dur = 650 + Math.random() * 450, turn = (Math.random() - 0.5) * 540;
+      const frames = [];
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12, s = (dur / 1000) * t;
+        frames.push({ transform: `translate(${x + vx * s}px, ${y + vy * s + 0.5 * g * s * s}px) rotate(${turn * t}deg) scale(${1 - 0.65 * t})`, opacity: t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45 });
+      }
+      el.animate(frames, { duration: dur, easing: 'linear', fill: 'forwards' }).onfinish = () => el.remove();
     }
+  }
+  /* A token that leaves `from` and lands on `to` along a curved path: wind-up, flight, squash on landing. */
+  function flyArc(from, to, html, land) {
+    const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+    if (calm.matches || !document.body.animate || b.bottom < 0 || b.top > innerHeight) { land(); return; }
+    const x0 = a.left + 14, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+    const cx = (x0 + x1) / 2 + (x1 - x0) * 0.1, cy = Math.min(y0, y1) - Math.max(80, Math.abs(x1 - x0) * 0.25);
+    const el = document.createElement('span');
+    el.className = 'token'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = html;
+    document.body.appendChild(el);
+    const at = (t) => [(1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * cx + t * t * x1, (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cy + t * t * y1];
+    const frames = [
+      { offset: 0, transform: `translate(${x0}px, ${y0}px) scale(.4)`, opacity: 0 },
+      { offset: 0.14, transform: `translate(${x0}px, ${y0 + 7}px) scale(1.2, .8)`, opacity: 1 },
+    ];
+    for (let i = 1; i <= 9; i++) {
+      const t = i / 10, [x, y] = at(t);
+      frames.push({ offset: 0.14 + 0.72 * t, transform: `translate(${x}px, ${y}px) rotate(${-18 + 36 * t}deg) scale(.9, 1.12)`, opacity: 1 });
+    }
+    frames.push({ offset: 0.92, transform: `translate(${x1}px, ${y1}px) scale(1.3, .72)`, opacity: 1 });
+    frames.push({ offset: 1, transform: `translate(${x1}px, ${y1}px) scale(.3)`, opacity: 0 });
+    el.animate(frames, { duration: 820, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' }).onfinish = () => { el.remove(); land(); };
   }
   function ripple(x, y, color) {
     if (calm.matches) return;
@@ -505,25 +636,38 @@ dialog form::before {
     if (age >= 3600) stampStart.delete(id);
     const stamping = age < 3600;
     const delay = stamping ? ` style="animation-delay:${-age}ms,${2400 - age}ms"` : '';
-    return `<svg class="stamp${stamping ? ' stamping' : ''}"${delay} viewBox="0 0 100 100" aria-hidden="true"><defs><path id="${pid}" d="M50 50m-35 0a35 35 0 1 1 70 0a35 35 0 1 1-70 0"/></defs><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width=".8"/><circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2.6"/><path d="M50 34l3.6 12.4L66 50l-12.4 3.6L50 66l-3.6-12.4L34 50l12.4-3.6z" fill="currentColor"/><text font-size="8.6" letter-spacing="2.4" fill="currentColor"><textPath href="#${pid}">COMPLETE ✦ ALL STEPS INKED ✦</textPath></text></svg>`;
+    return `<svg class="stamp${stamping ? ' stamping' : ''}"${delay} viewBox="0 0 100 100" aria-hidden="true"><defs><path id="${pid}" d="M50 50m-35 0a35 35 0 1 1 70 0a35 35 0 1 1-70 0"/></defs><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width=".8"/><circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2.6"/><path d="M50 34l3.6 12.4L66 50l-12.4 3.6L50 66l-3.6-12.4L34 50l12.4-3.6z" fill="currentColor"/><text font-size="8.6" letter-spacing="2.4" fill="currentColor"><textPath href="#${pid}">SEALED ✦ ALL STEPS INKED ✦</textPath></text></svg>`;
   }
   function playFx() {
-    if (fx.step) {
-      const [c, p, i] = fx.step.key.split('|');
-      const el = document.querySelector(`.step[data-c="${CSS.escape(c)}"][data-p="${CSS.escape(p)}"][data-i="${i}"]`);
-      if (el) {
-        el.classList.add('just-' + fx.step.status);
-        const r = el.getBoundingClientRect();
-        const x = r.left + 14, y = r.top + r.height / 2;
-        ripple(x, y, FX_COLORS[fx.step.status]);
-        if (fx.step.status === 'done') burst(x, y, 12);
+    const bursts = { n: 0 };
+    for (const s of fx.steps) {
+      // the page may re-render or scroll before a delayed effect fires, so look the step up again each time
+      const find = () => document.querySelector(`.step[data-c="${CSS.escape(s.c)}"][data-p="${CSS.escape(s.p)}"][data-i="${s.i}"]`);
+      const el = find();
+      if (!el) continue;
+      el.style.setProperty('--d', s.delay + 'ms');
+      el.classList.add('just-' + s.status);
+      setTimeout(() => {
+        const now = find();
+        if (!now) return;
+        const r = now.getBoundingClientRect(), x = r.left + 14, y = r.top + r.height / 2;
+        ripple(x, y, FX_COLORS[s.status]);
+        if (s.status === 'done' && s.main && bursts.n++ < 6) burst(x, y, 12);
+      }, s.delay + 280);
+      if (s.status === 'waiting') {
+        setTimeout(() => flyArc(find() || el, $('#wait-count').textContent ? $('#wait-count') : $('[data-filter="waiting"]'), ICON.glass, () => {
+          const t = $('[data-filter="waiting"]').getBoundingClientRect();
+          setCount(waitingCount());
+          ripple(t.left + t.width / 2, t.top + t.height / 2, 'var(--gold)');
+        }), s.delay + 120);
       }
     }
     if (fx.finished && !calm.matches) {
       const st = document.querySelector(`#c-${CSS.escape(fx.finished)} .stamp`);
-      if (st) { const r = st.getBoundingClientRect(); setTimeout(() => burst(r.left + r.width / 2, r.top + r.height / 2, 28, { far: true }), 420); }
+      if (st) { const r = st.getBoundingClientRect(); setTimeout(() => burst(r.left + r.width / 2, r.top + r.height / 2, 28, { far: true }), 500); }
     }
-    fx.step = null; fx.finished = null; fx.unfold = null; fx.newFiles.clear();
+    if (fx.pay) document.querySelector(`[data-act="cycle-paid"][data-id="${CSS.escape(fx.pay)}"]`)?.classList.add('flip');
+    fx.steps = []; fx.finished = null; fx.unfold = null; fx.pay = null; fx.newFiles.clear();
   }
   function countUp(prev, now) {
     if (!prev) return;
@@ -642,19 +786,46 @@ dialog form::before {
       setStatus('saving');
     }
   }
+  /* Moving a step past "not started" marks every step before it in that piece done (lineart ticked → sketch ticked). */
+  function applyStep(c, p, idx, status, note) {
+    const s = p.steps[idx], today = todayStr(), out = [];
+    if (status !== 'todo') for (let j = 0; j < idx; j++) {
+      const e = p.steps[j];
+      if (e.status !== 'done') { e.status = 'done'; e.since = today; out.push({ c: c.id, p: p.id, i: j, status: 'done' }); }
+    }
+    if (s.status !== status) { s.since = today; out.push({ c: c.id, p: p.id, i: idx, status, main: true }); }
+    s.status = status;
+    if (note !== undefined) s.note = note;
+    return out;
+  }
+  function finishFx(c, wasFinished) {
+    if (!wasFinished && derive(c).finished) { fx.finished = c.id; linger.add(c.id); stampStart.set(c.id, performance.now()); }
+  }
   function setStep(cid, pid, idx, status, note) {
     const c = state.commissions[cid];
     const p = c?.pieces?.find((x) => x.id === pid);
-    const s = p?.steps?.[idx];
-    if (!s) return;
+    if (!p?.steps?.[idx]) return;
     const wasFinished = derive(c).finished;
-    const changed = s.status !== status;
-    if (changed) s.since = todayStr();
-    s.status = status;
-    if (note !== undefined) s.note = note;
+    const changes = applyStep(c, p, idx, status, note);
+    changes.forEach((x, k) => { x.delay = k * 110; });
+    fx.steps.push(...changes);
     c.updatedAt = new Date().toISOString();
-    if (changed) fx.step = { key: cid + '|' + pid + '|' + idx, status };
-    if (!wasFinished && derive(c).finished) { fx.finished = cid; linger.add(cid); stampStart.set(cid, performance.now()); }
+    finishFx(c, wasFinished);
+    commit();
+  }
+  /* The same step, by name, on every piece of a commission. */
+  function setStepAll(cid, name, status) {
+    const c = state.commissions[cid];
+    if (!c) return;
+    const wasFinished = derive(c).finished;
+    let k = 0;
+    for (const p of c.pieces || []) {
+      const idx = (p.steps || []).findIndex((s) => s.name.toLowerCase() === name.toLowerCase());
+      if (idx === -1) continue;
+      for (const x of applyStep(c, p, idx, status)) { x.delay = Math.min(k++, 24) * 40; fx.steps.push(x); }
+    }
+    c.updatedAt = new Date().toISOString();
+    finishFx(c, wasFinished);
     commit();
   }
   function editPieces(cid, mutate) {
@@ -704,9 +875,10 @@ dialog form::before {
   function setStatus(kind, msg) { repo.status = kind; repo.msg = msg || ''; renderSync(); }
   function renderSync() {
     const dot = $('#sync-dot'), text = $('#sync-text');
-    dot.className = 'dot ' + (repo.status === 'ok' ? 'ok' : repo.status === 'saving' ? 'saving' : repo.status === 'error' ? 'error' : 'off');
+    dot.className = 'dot ' + (repo.status === 'ok' ? 'ok' : repo.status === 'saving' || repo.status === 'loading' ? 'saving' : repo.status === 'error' ? 'error' : 'off');
     if (!connected()) text.textContent = 'Saved in this browser only';
     else if (repo.status === 'saving') text.textContent = 'Saving to GitHub…';
+    else if (repo.status === 'loading') text.textContent = 'Loading your ledger from GitHub…';
     else if (repo.status === 'error') text.textContent = repo.msg;
     else if (repo.lastSynced) {
       const mins = Math.floor((Date.now() - repo.lastSynced) / 60000);
@@ -821,8 +993,8 @@ dialog form::before {
         const img = document.querySelector('img[data-path]:not([src])');
         if (!img) break;
         const path = img.dataset.path;
-        try { const url = await fileUrl(path); document.querySelectorAll(`img[data-path="${CSS.escape(path)}"]`).forEach((i) => { i.src = url; }); }
-        catch (e) { document.querySelectorAll(`img[data-path="${CSS.escape(path)}"]`).forEach((i) => { i.replaceWith(Object.assign(document.createElement('span'), { textContent: 'Preview unavailable' })); }); }
+        try { const url = await fileUrl(path); document.querySelectorAll(`img[data-path="${CSS.escape(path)}"]`).forEach((i) => { i.src = url; i.parentElement.classList.remove('loading'); }); }
+        catch (e) { document.querySelectorAll(`img[data-path="${CSS.escape(path)}"]`).forEach((i) => { i.parentElement.classList.remove('loading'); i.replaceWith(Object.assign(document.createElement('span'), { textContent: 'Preview unavailable' })); }); }
       }
     } finally { thumbsLoading = false; }
   }
@@ -899,7 +1071,7 @@ dialog form::before {
   function render() {
     if (animateAll) linger.clear();
     renderSeals();
-    renderWaiting();
+    renderCount();
     renderClientFilter();
     renderSync();
     document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
@@ -908,22 +1080,20 @@ dialog form::before {
     $('#client-filter').hidden = state.view !== 'commissions';
     if (state.view === 'clients') renderClients(); else renderCommissions();
     loadThumbs();
+    restage();
     playFx();
     animateAll = false;
   }
 
   function renderSeals() {
     const today = todayStr();
-    let doing = 0, waiting = 0, oldest = 0, dueSoon = 0, overdue = 0;
+    let doing = 0, dueSoon = 0, overdue = 0;
     const earned = { money: 0, robux: 0 }, due = { money: 0, robux: 0 };
     for (const c of Object.values(state.commissions)) {
       const d = derive(c);
       for (const p of d.pieces) {
         const cur = currentStep(p);
-        if (!cur) continue;
-        const w = (p.steps || []).find((s) => s.status === 'waiting');
-        if (w) { waiting++; oldest = Math.max(oldest, w.since ? daysFrom(w.since, today) : 0); }
-        else if (cur.step.status === 'doing') doing++;
+        if (cur && cur.step.status === 'doing' && !(p.steps || []).some((s) => s.status === 'waiting')) doing++;
       }
       if (!d.finished && c.due) {
         const left = daysFrom(today, c.due);
@@ -932,33 +1102,33 @@ dialog form::before {
       earned[payUnit(c)] += received(c);
       due[payUnit(c)] += owed(c);
     }
-    const both = (o) => [o.money || !o.robux ? money(o.money) : '', o.robux ? robux(o.robux) : ''].filter(Boolean);
     const earnedParts = [earned.money || !earned.robux ? ['money', earned.money] : null, earned.robux ? ['robux', earned.robux] : null].filter(Boolean);
     const owedParts = [due.money ? money(due.money) : '', due.robux ? robux(due.robux) : ''].filter(Boolean);
     $('#seals').innerHTML = `
-      <div class="seal wash"><span class="k">In progress</span><span class="v">${doing}</span><span class="s">${doing === 1 ? 'piece' : 'pieces'} on your desk</span></div>
-      <div class="seal gold"><span class="k">Waiting on clients</span><span class="v">${waiting}</span><span class="s">${waiting ? 'longest: ' + oldest + (oldest === 1 ? ' day' : ' days') : 'nothing pending'}</span></div>
-      <div class="seal ${overdue ? 'red' : ''}"><span class="k">Due this week</span><span class="v">${dueSoon + overdue}</span><span class="s">${overdue ? overdue + ' overdue' : 'next 7 days'}</span></div>
-      <div class="seal"><span class="k">Earned</span><span class="v ${earnedParts.length > 1 ? 'multi' : ''}" id="earned">${earnedParts.map(([k, v]) => `<span data-kind="${k}">${esc(amt(k, v))}</span>`).join('<br>')}</span><span class="s">${owedParts.length ? 'Still owed: ' + esc(owedParts.join(' · ')) : 'Nothing owed'}</span></div>`;
+      <div class="seal wash"><span class="k">Pieces in progress</span><span class="v">${doing}</span></div>
+      <div class="seal ${overdue ? 'red' : ''}"><span class="k">Due within 7 days</span><span class="v">${dueSoon + overdue}</span>${overdue ? `<span class="s">${overdue} overdue</span>` : ''}</div>
+      <div class="seal gold"><span class="k">Earned so far</span><span class="v ${earnedParts.length > 1 ? 'multi' : ''}" id="earned">${earnedParts.map(([k, v]) => `<span data-kind="${k}">${esc(amt(k, v))}</span>`).join('<br>')}</span>${owedParts.length ? `<span class="s">Still owed: ${esc(owedParts.join(' · '))}</span>` : ''}</div>`;
     if (!sealsShown) { document.querySelectorAll('#seals .seal').forEach((el, k) => { el.classList.add('enter'); el.style.setProperty('--i', k); }); sealsShown = true; }
     countUp(prevEarned, earned);
     prevEarned = { ...earned };
   }
 
-  function renderWaiting() {
-    const today = todayStr();
-    const items = [];
-    for (const c of Object.values(state.commissions)) for (const p of c.pieces || []) (p.steps || []).forEach((s) => {
-      if (s.status === 'waiting') items.push({ c, p, s, age: s.since ? daysFrom(s.since, today) : 0 });
-    });
-    items.sort((a, b) => b.age - a.age);
-    $('#waiting').hidden = items.length === 0;
-    $('#waiting-list').innerHTML = items.map((x) => `
-      <li><button type="button" data-goto="${esc(x.c.id)}">
-        <span class="age">${x.age === 0 ? 'today' : x.age + (x.age === 1 ? ' day' : ' days')}</span>
-        <span><b>${esc(clientName(x.c.clientId))}</b> · ${esc(x.c.title)} · ${esc(x.p.name)} — ${esc(x.s.name)}</span>
-        ${x.s.note ? `<span class="what">${esc(x.s.note)}</span>` : ''}
-      </button></li>`).join('');
+  function waitingCount() {
+    let n = 0;
+    for (const c of Object.values(state.commissions)) for (const p of c.pieces || []) if ((p.steps || []).some((s) => s.status === 'waiting')) n++;
+    return n;
+  }
+  let shownWait = null;
+  function setCount(n) {
+    const el = $('#wait-count');
+    if (shownWait !== null && n !== shownWait) { el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick'); }
+    el.textContent = n ? String(n) : '';
+    shownWait = n;
+  }
+  /* While a waiting token is in flight the counter keeps its old number; it ticks when the token lands. */
+  function renderCount() {
+    if (shownWait !== null && fx.steps.some((s) => s.status === 'waiting')) return;
+    setCount(waitingCount());
   }
 
   function renderClientFilter() {
@@ -980,7 +1150,7 @@ dialog form::before {
     main.className = 'list';
     const all = Object.values(state.commissions);
     if (all.length === 0) {
-      main.innerHTML = `<div class="empty"><h2>No commissions yet</h2><p>Add a commission and list its pieces. Each piece gets its own sketch, lineart and render steps.</p><button class="btn" type="button" data-act="new-commission">+ New commission</button>${connected() ? '' : '<p>To use the same ledger on another computer and keep finished files, open <button type="button" class="link" data-act="sync">Sync settings</button> first.</p>'}</div>`;
+      main.innerHTML = `<div class="empty">${INKPOT}<h2>No commissions yet</h2><p>Add a commission and list its pieces. Each piece gets its own sketch, lineart and render steps.</p><button class="btn" type="button" data-act="new-commission">${ICON.plus}New commission</button>${connected() ? '' : '<p>To use the same ledger on another computer and keep finished files, open <button type="button" class="link" data-act="sync">Sync settings</button> first.</p>'}</div>`;
       return;
     }
     const today = todayStr();
@@ -992,7 +1162,9 @@ dialog form::before {
       if (state.filter === 'finished') return d.finished;
       return true;
     });
+    const waitAge = (c) => Math.max(-1, ...(c.pieces || []).flatMap((p) => (p.steps || []).filter((s) => s.status === 'waiting').map((s) => (s.since ? daysFrom(s.since, today) : 0))));
     rows.sort((a, b) => {
+      if (state.filter === 'waiting') { const d = waitAge(b.c) - waitAge(a.c); if (d) return d; }
       if (a.d.finished !== b.d.finished) return a.d.finished ? 1 : -1;
       const ad = a.c.due || '9999-99-99', bd = b.c.due || '9999-99-99';
       if (ad !== bd) return ad < bd ? -1 : 1;
@@ -1000,7 +1172,7 @@ dialog form::before {
     });
     if (rows.length === 0) {
       const label = { active: 'in the works', waiting: 'waiting on a client', finished: 'finished', all: 'here' }[state.filter];
-      main.innerHTML = `<div class="empty"><h2>Nothing ${label}</h2><p>Try another filter or clear the search.</p></div>`;
+      main.innerHTML = `<div class="empty">${INKPOT}<h2>Nothing ${label}</h2><p>Try another filter or clear the search.</p></div>`;
       return;
     }
     main.innerHTML = rows.map(({ c, d }, k) => folio(c, d, today, k)).join('');
@@ -1036,14 +1208,14 @@ dialog form::before {
     const pct = d.total ? Math.round((d.done / d.total) * 100) : 0;
     const head = `
       <div class="fhead">
-        <button type="button" class="fold" data-act="fold" data-id="${esc(c.id)}" aria-expanded="${!collapsed}" aria-label="${collapsed ? 'Expand' : 'Collapse'} ${esc(c.title)}">${CHEVRON}</button>
+        <button type="button" class="fold" data-act="fold" data-id="${esc(c.id)}" aria-expanded="${!collapsed}" aria-label="${collapsed ? 'Expand' : 'Collapse'} ${esc(c.title)}">${ICON.chevron}</button>
         <div class="main">
           <h3>${esc(c.title)}</h3>
           <div class="meta">
             <button type="button" class="chip ${count > 1 ? 'repeat' : ''}" data-act="filter-client" data-id="${esc(c.clientId)}" title="Show only this client">${esc(clientName(c.clientId))}${count > 1 ? ' · ' + count + ' commissions' : ''}</button>
             ${c.kind ? `<span>${esc(c.kind)}</span>` : ''}
             ${due}
-            ${d.finished ? '<span class="chip pay-paid">All steps done</span>' : collapsed ? `<span>${d.done} of ${d.total} steps done</span>` : ''}
+            ${collapsed && !d.finished ? `<span>${d.done} of ${d.total} steps done</span>` : ''}
             ${collapsed && c.files?.length ? `<span>${c.files.length} ${c.files.length === 1 ? 'file' : 'files'}</span>` : ''}
           </div>
         </div>
@@ -1060,11 +1232,11 @@ dialog form::before {
       <div class="progress"><span>${d.done} of ${d.total} steps done</span><div class="track"><div class="fill" style="width:${pct}%"></div></div></div>
       ${c.notes ? `<p class="fnotes">${esc(c.notes)}</p>` : ''}
       ${pieces ? `<ul class="pieces">${pieces}</ul>` : '<p class="fnotes">No pieces yet.</p>'}
-      ${files || up ? `<div class="files"><div class="files-head"><span>Files</span>${up ? `<span class="up">Uploading ${up.done + 1 > up.total ? up.total : up.done + 1} of ${up.total}…</span>` : ''}</div>${files ? `<ul class="file-grid">${files}</ul>` : ''}</div>` : ''}
+      ${files || up ? `<div class="files"><div class="files-head"><span>Files</span>${up ? `<span class="up">Uploading ${Math.min(up.done + 1, up.total)} of ${up.total}<span class="upbar"><i style="width:${Math.round((up.done / up.total) * 100)}%"></i></span></span>` : ''}</div>${files ? `<ul class="file-grid">${files}</ul>` : ''}</div>` : ''}
       <div class="ffoot">
         <div class="actions">
-          <button type="button" class="btn ghost small" data-act="add-piece" data-id="${esc(c.id)}">+ Add piece</button>
-          <button type="button" class="btn ghost small" data-act="add-files" data-id="${esc(c.id)}">+ Add files</button>
+          <button type="button" class="btn ghost small" data-act="add-piece" data-id="${esc(c.id)}">${ICON.plus}Add piece</button>
+          <button type="button" class="btn ghost small" data-act="add-files" data-id="${esc(c.id)}">${ICON.plus}Add files</button>
         </div>
         <button type="button" class="link" data-act="edit-commission" data-id="${esc(c.id)}">Edit commission</button>
       </div>
@@ -1078,7 +1250,7 @@ dialog form::before {
     const known = thumbUrls.get(f.path);
     const inner = isImg ? `<img alt="" data-path="${esc(f.path)}"${known ? ` src="${esc(known)}"` : ''}>` : `<span>${esc((f.name.split('.').pop() || 'file').toUpperCase())}</span>`;
     return `<li class="file${fx.newFiles.has(f.id) ? ' enter' : ''}">
-      <button type="button" class="thumb" data-act="${isImg ? 'preview' : 'download'}" data-c="${esc(c.id)}" data-f="${esc(f.id)}" aria-label="${isImg ? 'Preview' : 'Download'} ${esc(f.name)}">${inner}</button>
+      <button type="button" class="thumb${isImg && !known ? ' loading' : ''}" data-act="${isImg ? 'preview' : 'download'}" data-c="${esc(c.id)}" data-f="${esc(f.id)}" aria-label="${isImg ? 'Preview' : 'Download'} ${esc(f.name)}">${inner}</button>
       <div class="fmeta"><span class="fname" title="${esc(f.name)}">${esc(f.name)}</span><span class="fsize">${fmtSize(f.size || 0)}</span></div>
       <div class="facts">
         <button type="button" class="link" data-act="download" data-c="${esc(c.id)}" data-f="${esc(f.id)}">Download</button>
@@ -1090,13 +1262,12 @@ dialog form::before {
   function pieceRow(c, p, today) {
     const cur = currentStep(p);
     const w = (p.steps || []).find((s) => s.status === 'waiting');
-    let now;
-    if (!cur) now = `<span class="now">Finished</span>`;
-    else if (w) {
+    let now = '';
+    if (w) {
       const age = w.since ? daysFrom(w.since, today) : 0;
-      now = `<span class="now wait">${esc(w.name)}: waiting${w.note ? ' — ' + esc(w.note) : ''} · ${age === 0 ? 'since today' : age + (age === 1 ? ' day' : ' days')}</span>`;
-    } else {
-      now = `<span class="now">Now: ${esc(cur.step.name)} · ${(STATUS_LABEL[cur.step.status] || '').toLowerCase()}${cur.step.note ? ' — ' + esc(cur.step.note) : ''}</span>`;
+      now = `<span class="now wait">${esc(w.name)} · waiting ${age === 0 ? 'since today' : age + (age === 1 ? ' day' : ' days')}${w.note ? ' — ' + esc(w.note) : ''}</span>`;
+    } else if (cur && cur.step.note) {
+      now = `<span class="now">${esc(cur.step.name)}: ${esc(cur.step.note)}</span>`;
     }
     const steps = (p.steps || []).map((s, i) => `
       <button type="button" class="step" data-status="${esc(s.status)}" data-act="step" data-c="${esc(c.id)}" data-p="${esc(p.id)}" data-i="${i}"
@@ -1121,7 +1292,7 @@ dialog form::before {
       .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     if (Object.keys(state.clients).length === 0) {
       main.className = 'list';
-      main.innerHTML = `<div class="empty"><h2>No clients yet</h2><p>Add the people you draw for. Their commissions stay grouped under them, so repeat clients are easy to spot.</p><button class="btn" type="button" data-act="new-client">+ Client</button></div>`;
+      main.innerHTML = `<div class="empty">${INKPOT}<h2>No clients yet</h2><p>Add the people you draw for. Their commissions stay grouped under them, so repeat clients are easy to spot.</p><button class="btn" type="button" data-act="new-client">${ICON.plus}Client</button></div>`;
       return;
     }
     main.className = 'clients';
@@ -1137,14 +1308,14 @@ dialog form::before {
         <h3>${esc(cl.name)}</h3>
         ${cl.contact ? `<span class="contact">${esc(cl.contact)}</span>` : ''}
         <div class="meta">
-          <span class="chip ${comms.length > 1 ? 'repeat' : ''}">${comms.length} ${comms.length === 1 ? 'commission' : 'commissions'}</span>
+          ${comms.length > 1 ? `<span class="chip repeat">${comms.length} commissions</span>` : ''}
           ${active ? `<span class="chip soon">${active} in the works</span>` : ''}
           ${gotText ? `<span>Earned ${esc(gotText)}</span>` : ''}
           ${last ? `<span>Last: ${new Date(last).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>` : ''}
         </div>
         ${cl.notes ? `<p>${esc(cl.notes)}</p>` : ''}
         <div class="row">
-          <button type="button" class="btn small" data-act="new-commission-for" data-id="${esc(cl.id)}">+ Commission</button>
+          <button type="button" class="btn small" data-act="new-commission-for" data-id="${esc(cl.id)}">${ICON.plus}Commission</button>
           <button type="button" class="btn ghost small" data-act="filter-client" data-id="${esc(cl.id)}">See commissions</button>
           <button type="button" class="link" data-act="edit-client" data-id="${esc(cl.id)}">Edit</button>
         </div>
@@ -1154,13 +1325,27 @@ dialog form::before {
 
   /* ---------- step popover ---------- */
   let pop = null;
-  function closePop() { if (pop) { pop.remove(); pop = null; } }
+  function closePop() { if (pop) { pop.remove(); pop = null; restage(); } }
+  /* Staging: while the menu is open, its card and piece stay lit and everything else steps back. */
+  function restage() {
+    const on = !!pop;
+    document.body.classList.toggle('staging', on);
+    $('#main').classList.toggle('staging', on && state.view === 'commissions');
+    document.querySelectorAll('.staged').forEach((e) => e.classList.remove('staged'));
+    if (!on) return;
+    const [c, p] = pop.dataset.for.split('|');
+    const card = document.getElementById('c-' + c);
+    if (!card) return;
+    card.classList.add('staged');
+    card.querySelector(`.step[data-p="${CSS.escape(p)}"]`)?.closest('.piece')?.classList.add('staged');
+  }
   function openStepMenu(btn) {
     closePop();
     const cid = btn.dataset.c, pid = btn.dataset.p, idx = Number(btn.dataset.i);
     const p = state.commissions[cid]?.pieces?.find((x) => x.id === pid);
     const s = p?.steps?.[idx];
     if (!s) return;
+    const same = (state.commissions[cid].pieces || []).filter((q) => (q.steps || []).some((t) => t.name.toLowerCase() === s.name.toLowerCase())).length;
     pop = document.createElement('div');
     pop.className = 'pop';
     pop.dataset.for = cid + '|' + pid + '|' + idx;
@@ -1169,9 +1354,11 @@ dialog form::before {
     pop.innerHTML = `
       <div class="ph">${esc(p.name)} · ${esc(s.name)}</div>
       ${STATUSES.map(([k, label]) => `<button type="button" class="opt" data-status="${k}" aria-pressed="${s.status === k}">${ring(k)}<span>${label}</span></button>`).join('')}
+      ${same > 1 ? `<button type="button" class="opt all" data-all>${ICON.stars}<span>${esc(s.name)} done on all ${same} pieces</span></button>` : ''}
       <label for="pop-note">${s.status === 'waiting' ? 'What are you waiting for?' : 'Note (optional)'}</label>
       <div class="noterow"><input id="pop-note" value="${esc(s.note || '')}" placeholder="e.g. sketch approval, references"><button type="button" class="btn small" data-save>Save</button></div>`;
     document.body.appendChild(pop);
+    restage();
     const r = btn.getBoundingClientRect();
     const w = pop.offsetWidth;
     const left = Math.min(Math.max(8, r.left + window.scrollX), window.scrollX + document.documentElement.clientWidth - w - 8);
@@ -1180,7 +1367,7 @@ dialog form::before {
     const note = $('#pop-note', pop);
     let current = s.status;
     pop.addEventListener('click', (e) => {
-      const opt = e.target.closest('.opt');
+      const opt = e.target.closest('.opt[data-status]');
       if (opt) {
         current = opt.dataset.status;
         pop.querySelectorAll('.opt').forEach((o) => o.setAttribute('aria-pressed', String(o === opt)));
@@ -1189,6 +1376,7 @@ dialog form::before {
         else closePop();
         return;
       }
+      if (e.target.closest('[data-all]')) { closePop(); setStepAll(cid, s.name, 'done'); return; }
       if (e.target.closest('[data-save]')) { setStep(cid, pid, idx, current, note.value.trim()); closePop(); }
     });
     note.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); setStep(cid, pid, idx, current, note.value.trim()); closePop(); } });
@@ -1218,9 +1406,10 @@ dialog form::before {
     const err = form.querySelector('.err');
     const btn = form.querySelector('button[type="submit"]');
     if (btn) btn.disabled = true;
+    const slow = setTimeout(() => btn && btn.classList.add('busy'), 150);
     let result;
     try { result = await onSubmit(new FormData(form)); }
-    finally { if (btn) btn.disabled = false; }
+    finally { clearTimeout(slow); if (btn) { btn.disabled = false; btn.classList.remove('busy'); } }
     if (typeof result === 'string') { if (err) { err.textContent = result; err.hidden = false; } return; }
     closeDialog();
   });
@@ -1254,7 +1443,7 @@ dialog form::before {
     const sel = c ? c.clientId : (presetClient || state.client || '');
     const t = c ? payType(c) : 'money';
     openDialog(`
-      <h2>${c ? 'Edit commission' : 'New commission'}</h2>
+      <h2>${c ? `Edit “${esc(c.title)}”` : 'New commission'}</h2>
       <label class="field"><span>Title</span><input name="title" required value="${esc(c?.title || '')}" placeholder="e.g. Forest tileset & item icons"></label>
       <div class="grid2">
         <label class="field"><span>Client</span><select name="clientId" id="f-client">${clientOptions(sel)}</select></label>
@@ -1332,8 +1521,8 @@ dialog form::before {
     if (!c) return;
     const unit = payUnit(c);
     openDialog(`
-      <h2>Log a payout</h2>
-      <p class="hint">${esc(c.title)} · ${num(c.percent)}% share · ${esc(amt(unit, received(c)))} received so far</p>
+      <h2>Log a payout for “${esc(c.title)}”</h2>
+      <p class="hint">${num(c.percent)}% share · ${esc(amt(unit, received(c)))} received so far</p>
       <label class="field"><span>Amount received (${unit === 'robux' ? 'R$' : esc(state.currency)})</span><input type="number" name="amount" min="0" step="any" required></label>
       <p class="err" hidden></p>
       <div class="dfoot">
@@ -1352,7 +1541,7 @@ dialog form::before {
     const cl = id ? state.clients[id] : null;
     const count = id ? clientCommissionCount(id) : 0;
     openDialog(`
-      <h2>${cl ? 'Edit client' : 'New client'}</h2>
+      <h2>${cl ? `Edit ${esc(cl.name)}` : 'New client'}</h2>
       <label class="field"><span>Name</span><input name="name" required value="${esc(cl?.name || '')}" placeholder="Name or handle"></label>
       <label class="field"><span>Contact</span><input name="contact" value="${esc(cl?.contact || '')}" placeholder="Email, Discord, Roblox…"></label>
       <label class="field"><span>Notes</span><textarea name="notes" placeholder="Preferences, past feedback, rates you agreed…">${esc(cl?.notes || '')}</textarea></label>
@@ -1377,7 +1566,7 @@ dialog form::before {
     const p = pid ? c?.pieces?.find((x) => x.id === pid) : null;
     const lastSteps = (c?.pieces || []).slice(-1)[0]?.steps?.map((s) => s.name).join(', ');
     openDialog(`
-      <h2>${p ? 'Edit piece' : 'Add pieces'}</h2>
+      <h2>${p ? `Edit ${esc(p.name)}` : `Add pieces to “${esc(c.title)}”`}</h2>
       ${p ? `<label class="field"><span>Name</span><input name="name" required value="${esc(p.name)}"></label>`
           : `<label class="field"><span>Pieces</span><textarea name="names" required placeholder="One per line"></textarea></label>`}
       <label class="field"><span>Steps</span><input name="steps" value="${esc(p ? p.steps.map((s) => s.name).join(', ') : (lastSteps || DEFAULT_STEPS))}"><small>Comma-separated. Renaming a step resets it; steps you keep keep their progress.</small></label>
@@ -1413,21 +1602,21 @@ dialog form::before {
     if (!f) return;
     openDialog(`
       <h2>${esc(f.name)}</h2>
-      <img class="preview" id="pv" alt="${esc(f.name)}">
+      <img class="preview loading" id="pv" alt="${esc(f.name)}">
       <p class="hint" id="pv-status">Loading…</p>
       <div class="dfoot">
         <button type="button" class="btn ghost" data-cancel>Close</button>
         <button type="button" class="btn" data-dl>Download</button>
       </div>`, null, true);
     form._onDownload = () => downloadFile(f);
-    try { $('#pv', form).src = await fileUrl(f.path); $('#pv-status', form).hidden = true; }
+    try { const img = $('#pv', form); img.onload = () => img.classList.remove('loading'); img.src = await fileUrl(f.path); $('#pv-status', form).hidden = true; }
     catch (e) { $('#pv-status', form).textContent = 'Couldn’t load the preview. Check your connection.'; }
   }
 
   function syncDialog() {
     if (connected()) {
       openDialog(`
-        <h2>Sync settings</h2>
+        <h2>Syncing with ${esc(repo.owner)}/${esc(repo.name)}</h2>
         <p class="hint">This browser saves your ledger and files to <b>${esc(repo.owner)}/${esc(repo.name)}</b> on GitHub. ${esc($('#sync-text').textContent)}.</p>
         <p class="hint">Every save is a commit, so older versions are in the repository’s <a href="https://github.com/${esc(repo.owner)}/${esc(repo.name)}/commits" target="_blank" rel="noopener">history</a>.</p>
         <div class="dfoot">
@@ -1439,15 +1628,15 @@ dialog form::before {
       return;
     }
     openDialog(`
-      <h2>Sync between your computers</h2>
+      <h2>Sync this ledger between your computers</h2>
       <p class="hint">Your ledger and finished files are saved to a private GitHub repository of your own, so any browser you connect opens the same ledger. The README has these steps with more detail.</p>
       <ol>
         <li><a href="https://github.com/new" target="_blank" rel="noopener">Create a repository</a> named <b>atelier-ledger-data</b>, set to <b>Private</b>.</li>
         <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create a fine-grained token</a>. Under Repository access choose <b>Only select repositories</b> and pick that repository. Under Permissions, set <b>Contents</b> to <b>Read and write</b>. Generate it and copy it.</li>
         <li>Paste the token below. Do the same in your other browser.</li>
       </ol>
-      <label class="field"><span>GitHub token</span><input name="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…"><small>Kept only in this browser. It can only reach the one repository you picked.</small></label>
-      <label class="field"><span>Repository</span><input name="repo" value="atelier-ledger-data" spellcheck="false"><small>Its name, or username/name.</small></label>
+      <label class="field"><span>GitHub token</span><input name="token" class="mono" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…"><small>Kept only in this browser. It can only reach the one repository you picked.</small></label>
+      <label class="field"><span>Repository</span><input name="repo" class="mono" value="atelier-ledger-data" spellcheck="false"><small>Its name, or username/name.</small></label>
       <p class="hint">If the repository already has your ledger (from your other computer), this browser loads it and replaces what’s here.</p>
       <p class="err" hidden></p>
       <div class="dfoot">
@@ -1507,17 +1696,6 @@ dialog form::before {
   });
 
   document.addEventListener('click', (e) => {
-    const go = e.target.closest('[data-goto]');
-    if (go) {
-      if (state.view !== 'commissions') setView('commissions');
-      const id = go.dataset.goto;
-      if (state.collapsed.delete(id)) saveFolds();
-      render();
-      if (!document.getElementById('c-' + id)) { state.filter = 'all'; state.client = ''; state.q = ''; $('#search').value = ''; render(); }
-      const el = document.getElementById('c-' + id);
-      if (el) { el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
-      return;
-    }
     const b = e.target.closest('[data-act]');
     if (!b || b.closest('dialog')) return;
     const act = b.dataset.act;
@@ -1564,7 +1742,7 @@ dialog form::before {
       copy.steps = copy.steps.map((s) => ({ name: s.name, status: 'todo', note: '', since: '' }));
       pieces.splice(i + 1, 0, copy);
     });
-    else if (act === 'cycle-paid') { const c = state.commissions[b.dataset.id]; if (c) { c.paid = PAY_NEXT[c.paid] || 'deposit'; c.updatedAt = new Date().toISOString(); commit(); } }
+    else if (act === 'cycle-paid') { const c = state.commissions[b.dataset.id]; if (c) { c.paid = PAY_NEXT[c.paid] || 'deposit'; c.updatedAt = new Date().toISOString(); fx.pay = c.id; commit(); } }
     else if (act === 'filter-client') { state.client = b.dataset.id; state.filter = 'all'; setView('commissions'); }
   });
 
@@ -1572,7 +1750,7 @@ dialog form::before {
   try { const d = JSON.parse(lsGet(LS_DATA) || 'null'); if (d) applyData(d); } catch (e) {}
   try { state.collapsed = new Set(JSON.parse(lsGet(LS_FOLD) || '[]')); } catch (e) {}
   try { const m = JSON.parse(lsGet(LS_REPO) || 'null'); if (m) Object.assign(repo, { token: m.token || '', owner: m.owner || '', name: m.name || '', sha: m.sha || '', dirty: !!m.dirty }); } catch (e) {}
-  if (connected()) setStatus('saving');
+  if (connected()) setStatus(repo.dirty ? 'saving' : 'loading');
   render();
   startMotes();
   if (connected()) { if (repo.dirty) push(); else pull(); }
