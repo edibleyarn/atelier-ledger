@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Atelier Ledger</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231c2440'/%3E%3Cpath d='M32 9C30 21 24 31 15 40h34C40 31 34 21 32 9z' fill='%23f4efe3'/%3E%3Cpath d='M9 44c8-4 38-4 46 0' fill='none' stroke='%23f4efe3' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231c2440'/%3E%3Cg fill='none' stroke='%23e2bf76' stroke-width='2'%3E%3Ccircle cx='32' cy='32' r='23'/%3E%3Cpath d='M32 11L50 42H14Z'/%3E%3C/g%3E%3Cpath d='M32 22l2.6 7.4L42 32l-7.4 2.6L32 42l-2.6-7.4L22 32l7.4-2.6z' fill='%23f4efe3'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English&family=Alegreya+Sans:wght@400;500;700&display=swap">
 <style>
@@ -99,7 +99,6 @@ a { color: var(--wash); }
 
 /* ---------- header ---------- */
 .top { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
-.sigil { width: 60px; height: 60px; flex: none; color: var(--ink); margin-left: -4px; /* the circle's stroke sits inside the box; pull it to the text edge */ }
 .title { flex: 1 1 220px; min-width: 0; }
 .title h1 { font-size: var(--fs-7); line-height: 1; }
 .actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
@@ -128,7 +127,9 @@ a { color: var(--wash); }
 
 /* ---------- summary ---------- */
 .seals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
-.seal { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.seal { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.seal-glyph { position: absolute; right: -14px; top: -14px; width: 92px; height: 92px; color: var(--gold); opacity: .2; pointer-events: none; }
+.seal > :not(.seal-glyph) { position: relative; }
 .seal .k { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
 .seal .v { font-size: var(--fs-6); font-weight: 500; line-height: 1.1; overflow-wrap: anywhere; margin-left: -.04em; /* large numerals carry a left side bearing */ }
 .seal .v.multi { font-size: var(--fs-5); line-height: 1.2; }
@@ -301,7 +302,10 @@ dialog .hint { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); }
 .spark { position: fixed; z-index: 60; left: 0; top: 0; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); background: var(--c); pointer-events: none;
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); will-change: transform, opacity; }
 .spark.round { clip-path: none; border-radius: 50%; }
-.ripple { position: fixed; z-index: 60; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid var(--c); pointer-events: none; animation: ripple .7s var(--ease-out) forwards; }
+.ripple { position: fixed; z-index: 60; width: 64px; height: 64px; margin: -32px 0 0 -32px; color: var(--c); pointer-events: none; animation: ripple .9s var(--ease-out) forwards; }
+.ripple .ink { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw .5s var(--ease-inout) forwards; }
+.ripple .ink:nth-child(2) { animation-delay: .08s; }
+.ripple .ink:nth-child(3) { animation-delay: .16s; }
 .token { position: fixed; z-index: 61; left: 0; top: 0; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; background: var(--gold-bg); border: 1.5px dashed var(--gold); color: var(--gold); display: grid; place-items: center; pointer-events: none; will-change: transform; }
 .token .ico { width: 16px; height: 16px; }
 
@@ -326,11 +330,9 @@ dialog .hint { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); }
    Slow in, slow out: every transition uses an ease token, never linear (except constant rotation).
    Arcs: sparks and the waiting token travel on curved paths, not straight lines. */
 @media (prefers-reduced-motion: no-preference) {
-  .sigil .ink { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-inout) forwards; }
-  .sigil .ink:nth-of-type(2) { animation-delay: .2s; }
-  .sigil .ink:nth-of-type(3) { animation-delay: .45s; }
-  .sigil .hat { transform-box: fill-box; transform-origin: 50% 100%; animation: hat-land .9s 1s var(--ease-out) backwards; }
   .halo { animation: spin 240s linear infinite; }
+  .seal-glyph { animation: spin 120s linear infinite; }
+  .seal:hover .seal-glyph { animation-duration: 20s; }
   body.staging .halo { animation-play-state: paused; }
   .title h1 { animation: ink-reveal 1.1s .2s var(--ease-inout) backwards; }
   .seal.enter, .folio.enter, .client.enter, .file.enter { animation: unfurl var(--t-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 60ms); }
@@ -357,12 +359,6 @@ dialog .hint { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes sway { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
 @keyframes ink-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-@keyframes hat-land {
-  0%   { opacity: 0; transform: translateY(-14px) scale(.9, 1.15); animation-timing-function: var(--ease-in); }  /* falling, stretched */
-  55%  { opacity: 1; transform: translateY(0) scale(1.18, .8); animation-timing-function: var(--ease-out); }   /* impact: squash */
-  80%  { transform: translateY(-2px) scale(.96, 1.05); animation-timing-function: var(--ease-inout); }         /* rebound */
-  100% { transform: none; }
-}
 @keyframes unfurl { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes unfold { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @keyframes fold { to { opacity: 0; transform: translateY(-6px); } }
@@ -400,7 +396,7 @@ dialog .hint { margin: 0; font-size: var(--fs-2); color: var(--ink-soft); }
   100% { opacity: .9; transform: rotate(-12deg); }
 }
 @keyframes settle { to { opacity: .2; } }
-@keyframes ripple { from { opacity: .7; transform: scale(.4); } to { opacity: 0; transform: scale(3.4); } }
+@keyframes ripple { 0% { opacity: .9; transform: scale(.5) rotate(-40deg); } 60% { opacity: .75; } 100% { opacity: 0; transform: scale(1.6) rotate(25deg); } }
 
 /* ---------- embellishments ---------- */
 :root { --mote: 168,118,38; }
@@ -511,17 +507,6 @@ dialog form::before {
 </svg>
 <div class="wrap">
   <header class="top">
-    <svg class="sigil" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <circle class="ink" pathLength="1" cx="32" cy="32" r="29" stroke-width="1.5"/>
-      <circle class="ink" pathLength="1" cx="32" cy="32" r="24" stroke-width="1" stroke-dasharray="1.5 3.2"/>
-      <path class="ink" pathLength="1" d="M32 3v5M32 56v5M3 32h5M56 32h5" stroke-width="1.5"/>
-      <g class="hat">
-        <path d="M33 13c-3 9-7 16-14 23h26c-5-6-8-14-12-23z" fill="currentColor" stroke-width="1.5"/>
-        <path d="M14 40c9-3.5 27-3.5 36 0" stroke-width="2.4"/>
-        <path d="M24 33.5c5 1.4 11 1.4 16 0" stroke="var(--paper)" stroke-width="1.5"/>
-        <path d="M42 19l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="currentColor" stroke="none"/>
-      </g>
-    </svg>
     <div class="title"><h1>Atelier Ledger</h1></div>
     <div class="actions">
       <button class="btn" id="new-commission" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>New commission</button>
@@ -530,7 +515,7 @@ dialog form::before {
     </div>
   </header>
 
-  <div class="flourish" aria-hidden="true"><svg viewBox="0 0 260 18" fill="none" stroke="currentColor" stroke-linecap="round"><path class="line" pathLength="1" d="M108 9H4" stroke-width="1"/><path class="line" pathLength="1" d="M152 9H256" stroke-width="1"/><path class="line" pathLength="1" d="M112 13H60" stroke-width=".6"/><path class="line" pathLength="1" d="M148 13H200" stroke-width=".6"/><g class="gem" fill="currentColor" stroke="none"><path d="M130 1l2.6 5.4L138 9l-5.4 2.6L130 17l-2.6-5.4L122 9l5.4-2.6z"/><circle cx="116" cy="9" r="1.8"/><circle cx="144" cy="9" r="1.8"/></g></svg></div>
+  <div class="flourish" aria-hidden="true"><svg viewBox="0 0 260 18" fill="none" stroke="currentColor" stroke-linecap="round"><path class="line" pathLength="1" d="M110 9H4" stroke-width="1"/><path class="line" pathLength="1" d="M150 9H256" stroke-width="1"/><path class="line" pathLength="1" d="M112 13H60" stroke-width=".6"/><path class="line" pathLength="1" d="M148 13H200" stroke-width=".6"/><g class="gem"><circle cx="130" cy="9" r="8" stroke-width="1"/><path d="M130 2.5l5.6 9.7h-11.2z" stroke-width=".8"/><path d="M130 15.5l-5.6-9.7h11.2z" stroke-width=".8"/><circle cx="130" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="114" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="146" cy="9" r="1.8" fill="currentColor" stroke="none"/></g></svg></div>
 
   <div id="notice" class="notice" hidden></div>
 
@@ -684,13 +669,15 @@ dialog form::before {
     frames.push({ offset: 1, transform: `translate(${x1}px, ${y1}px) scale(.3)`, opacity: 0 });
     el.animate(frames, { duration: 820, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' }).onfinish = () => { el.remove(); land(); };
   }
+  const RIPPLE_SVG = '<svg viewBox="-32 -32 64 64" fill="none" stroke="currentColor" stroke-linecap="round"><circle class="ink" pathLength="1" r="22" stroke-width="1.6"/><circle class="ink" pathLength="1" r="17" stroke-width="1" stroke-dasharray=".04 .03"/><path class="ink" pathLength="1" d="M0-17L14.7 8.5H-14.7Z" stroke-width="1.2"/></svg>';
   function ripple(x, y, color) {
     if (calm.matches) return;
     const el = document.createElement('span');
+    el.innerHTML = RIPPLE_SVG;
     el.className = 'ripple';
     el.setAttribute('aria-hidden', 'true');
     el.style.cssText = `left:${x}px;top:${y}px;--c:${color}`;
-    el.addEventListener('animationend', () => el.remove());
+    el.addEventListener('animationend', (e) => { if (e.target === el) el.remove(); });
     document.body.appendChild(el);
   }
   function stampSvg(id) {
@@ -769,12 +756,38 @@ dialog form::before {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       parts = Array.from({ length: Math.round(Math.min(46, (w * h) / 30000)) }, () => mk(true));
     };
+    /* now and then a spell circle is inked onto the paper, holds, and fades */
+    const spells = [];
+    let nextSpell = 2500;
+    const spellShapes = [3, 4, 6];
+    const drawSpell = (s, t) => {
+      const k = Math.min(1, t / 2600), fade = t < 5200 ? 1 : Math.max(0, 1 - (t - 5200) / 2600);
+      ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(s.rot + t / 40000);
+      ctx.strokeStyle = `rgba(${rgb},${0.22 * fade})`; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(0, 0, s.r, -Math.PI / 2, -Math.PI / 2 + 6.283 * Math.min(1, k * 1.6)); ctx.stroke();
+      if (k > 0.25) { ctx.setLineDash([2, 5]); ctx.beginPath(); ctx.arc(0, 0, s.r * 0.84, 0, 6.283 * Math.min(1, (k - 0.25) * 2)); ctx.stroke(); ctx.setLineDash([]); }
+      if (k > 0.45) {
+        const n = s.n, pk = Math.min(1, (k - 0.45) * 2.2), pts = [];
+        for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + (i * 2 * Math.PI) / (n === 6 ? 3 : n); pts.push([Math.cos(a) * s.r * 0.8, Math.sin(a) * s.r * 0.8]); }
+        const poly = (rot) => { ctx.beginPath(); const m = Math.max(1, Math.round(pts.length * pk)); for (let i = 0; i < m; i++) { const [x, y] = pts[i]; const c = Math.cos(rot), sn = Math.sin(rot); const X = x * c - y * sn, Y = x * sn + y * c; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke(); };
+        if (n === 6) { pts.length = 4; poly(0); poly(Math.PI); } else poly(0);
+      }
+      if (k > 0.8) { ctx.fillStyle = `rgba(${rgb},${0.3 * fade})`; star(0, 0, s.r * 0.12); }
+      ctx.restore();
+      return t < 7800;
+    };
     const star = (x, y, r) => { ctx.beginPath(); ctx.moveTo(x, y - r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.quadraticCurveTo(x, y, x, y + r); ctx.quadraticCurveTo(x, y, x - r, y); ctx.quadraticCurveTo(x, y, x, y - r); ctx.fill(); };
     const frame = (t) => {
       raf = requestAnimationFrame(frame);
       const dt = Math.min(50, last ? t - last : 16) / 16;
       last = t;
       ctx.clearRect(0, 0, w, h);
+      nextSpell -= dt * 16;
+      if (nextSpell <= 0 && spells.length < 2) {
+        spells.push({ x: w * (0.08 + Math.random() * 0.84), y: h * (0.1 + Math.random() * 0.8), r: 40 + Math.random() * 70, rot: Math.random() * 6.28, n: spellShapes[Math.floor(Math.random() * 3)], born: t });
+        nextSpell = 7000 + Math.random() * 8000;
+      }
+      for (let i = spells.length - 1; i >= 0; i--) if (!drawSpell(spells[i], t - spells[i].born)) spells.splice(i, 1);
       for (const p of parts) {
         p.y -= p.vy * dt; p.ph += 0.02 * dt; p.x += Math.sin(p.ph) * p.sw * 0.3 * dt;
         if (p.y < -10) Object.assign(p, mk(false));
@@ -1151,6 +1164,13 @@ dialog form::before {
     animateAll = false;
   }
 
+  /* three small spell circles, one per summary card */
+  const glyph = (inner) => `<svg class="seal-glyph" viewBox="-30 -30 60 60" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><circle r="28"/><circle r="24" stroke-dasharray="1.5 2.5"/>${inner}</svg>`;
+  const GLYPH = [
+    glyph('<path d="M0-24L20.8 12H-20.8Z"/><circle r="9"/><circle r="2" fill="currentColor" stroke="none"/>'),
+    glyph('<path d="M0-24L24 0 0 24-24 0Z"/><path d="M-12-12h24v24h-24Z"/><path d="M0-9v9l6 4"/>'),
+    glyph('<path d="M0-24L20.8 12H-20.8Z"/><path d="M0 24L-20.8-12H20.8Z"/><path d="M0-6l1.8 4.2L6 0l-4.2 1.8L0 6l-1.8-4.2L-6 0l4.2-1.8z" fill="currentColor" stroke="none"/>'),
+  ];
   function renderSeals() {
     const today = todayStr();
     let doing = 0, dueSoon = 0, overdue = 0;
@@ -1171,9 +1191,9 @@ dialog form::before {
     const earnedParts = [earned.money || !earned.robux ? ['money', earned.money] : null, earned.robux ? ['robux', earned.robux] : null].filter(Boolean);
     const owedParts = [due.money ? money(due.money) : '', due.robux ? robux(due.robux) : ''].filter(Boolean);
     $('#seals').innerHTML = `
-      <div class="seal wash"><span class="k">Pieces in progress</span><span class="v">${doing}</span></div>
-      <div class="seal ${overdue ? 'red' : ''}"><span class="k">Due within 7 days</span><span class="v">${dueSoon + overdue}</span>${overdue ? `<span class="s">${overdue} overdue</span>` : ''}</div>
-      <div class="seal gold"><span class="k">Earned so far</span><span class="v ${earnedParts.length > 1 ? 'multi' : ''}" id="earned">${earnedParts.map(([k, v]) => `<span data-kind="${k}">${esc(amt(k, v))}</span>`).join('<br>')}</span>${owedParts.length ? `<span class="s">Still owed: ${esc(owedParts.join(' · '))}</span>` : ''}</div>`;
+      <div class="seal wash">${GLYPH[0]}<span class="k">Pieces in progress</span><span class="v">${doing}</span></div>
+      <div class="seal ${overdue ? 'red' : ''}">${GLYPH[1]}<span class="k">Due within 7 days</span><span class="v">${dueSoon + overdue}</span>${overdue ? `<span class="s">${overdue} overdue</span>` : ''}</div>
+      <div class="seal gold">${GLYPH[2]}<span class="k">Earned so far</span><span class="v ${earnedParts.length > 1 ? 'multi' : ''}" id="earned">${earnedParts.map(([k, v]) => `<span data-kind="${k}">${esc(amt(k, v))}</span>`).join('<br>')}</span>${owedParts.length ? `<span class="s">Still owed: ${esc(owedParts.join(' · '))}</span>` : ''}</div>`;
     if (!sealsShown) { document.querySelectorAll('#seals .seal').forEach((el, k) => { el.classList.add('enter'); el.style.setProperty('--i', k); }); sealsShown = true; }
     countUp(prevEarned, earned);
     prevEarned = { ...earned };
