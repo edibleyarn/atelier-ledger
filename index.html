@@ -432,6 +432,68 @@ dialog form::before {
   .btn:hover:not(.busy)::after { animation: sheen .8s var(--ease-inout); }
 }
 @keyframes sheen { from { transform: translateX(-120%) skewX(-20deg); } to { transform: translateX(260%) skewX(-20deg); } }
+/* ---------- PSD export ---------- */
+.px-tools { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-2); color: var(--ink-soft); }
+.px-tools .spacer, .dfoot .spacer { flex: 1; }
+.px-list { --r: var(--r-md); --pad: var(--sp-2); list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: min(52vh, 560px); overflow: auto; border: 1px solid var(--line); border-radius: var(--r); padding: var(--sp-1); background: var(--paper); }
+.px-row { display: grid; grid-template-columns: auto 72px 1fr; gap: var(--sp-3); align-items: center; padding: 6px var(--sp-2) 6px calc(var(--sp-2) + var(--depth, 0) * 18px); border-radius: calc(var(--r) - var(--sp-1)); opacity: .62; transition: opacity var(--t-med) var(--ease-inout), background-color var(--t-med) var(--ease-inout); }
+.px-row.on { opacity: 1; background: var(--card); }
+.px-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--ink); margin: 0; }
+.px-thumb { width: 72px; height: 54px; border-radius: var(--r-sm); display: grid; place-items: center; overflow: hidden; font-size: var(--fs-1); color: var(--ink-soft);
+  background-color: var(--paper-2); background-image: linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%), linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%); background-size: 10px 10px; background-position: 0 0, 5px 5px; }
+.px-thumb.loading { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--card) 70%, transparent) 50%, transparent 70%); background-size: 250% 100%; animation: shimmer 1.3s var(--ease-inout) infinite; }
+.px-thumb canvas { max-width: 100%; max-height: 100%; display: block; }
+.px-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.px-src { font-size: var(--fs-1); color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.px-name { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.px-name input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--paper); border-radius: var(--r-sm); padding: 4px var(--sp-2); font-size: var(--fs-2); }
+.px-name span { font-size: var(--fs-2); color: var(--ink-soft); }
+.px-warn { font-size: var(--fs-1); color: var(--gold); }
+.spin { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; border-radius: 50%; border: 1.5px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
+@media (max-width: 460px) { .px-row { grid-template-columns: auto 56px 1fr; padding-left: calc(var(--sp-2) + var(--depth, 0) * 10px); } .px-thumb { width: 56px; height: 42px; } }
+
+/* ---------- waiting warnings ---------- */
+.pname .now.wait.late { color: var(--danger); font-weight: 500; }
+.step.late[data-status="waiting"] { border-color: var(--danger); background: var(--danger-bg); }
+.count.late { background: var(--danger); color: var(--card); }
+.tabs button[aria-pressed="true"] .count.late { background: var(--danger); color: var(--card); }
+.foot-set { display: inline-flex; gap: var(--sp-4); flex-wrap: wrap; }
+/* ---------- export modes ---------- */
+.px-mode { display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+.px-check { display: inline-flex; gap: 6px; align-items: center; font-size: var(--fs-2); }
+.px-check input { width: 16px; height: 16px; accent-color: var(--ink); margin: 0; }
+.px-wm { --r: var(--r-md); --pad: var(--sp-2); display: flex; gap: var(--sp-3); align-items: center; border: 1px dashed var(--gold); background: var(--gold-bg); border-radius: var(--r); padding: var(--pad); }
+.px-stamp { width: 64px; height: 64px; flex: none; border-radius: calc(var(--r) - var(--pad)); background: var(--card); display: grid; place-items: center; overflow: hidden; }
+.px-stamp:empty { display: none; }
+.px-stamp img { max-width: 100%; max-height: 100%; }
+.px-wm-text { display: flex; flex-direction: column; gap: var(--sp-1); font-size: var(--fs-2); }
+.px-wm-row { display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+.px-wm-row select { border: 1px solid var(--line); background: var(--card); border-radius: var(--r-sm); padding: 2px 6px; }
+/* ---------- quote ---------- */
+.q-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.q-row { --r: var(--r-md); display: grid; grid-template-columns: minmax(120px, 1fr) 70px auto 72px auto; gap: var(--sp-2) var(--sp-3); align-items: end; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: var(--sp-2) var(--sp-3); }
+.q-row:has(.q-thumb) { grid-template-columns: minmax(120px, 1fr) 70px 72px auto; }
+.q-row .q-extras { grid-column: 1 / -1; grid-row: 2; max-width: 260px; }
+.q-row .q-thumb { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr 120px; gap: var(--sp-3); align-items: end; }
+.q-label { border: 1px solid transparent; background: transparent; border-radius: var(--r-sm); padding: 4px 6px; font-weight: 500; min-width: 0; align-self: center; }
+.q-label:hover, .q-label:focus { border-color: var(--line); background: var(--card); }
+.q-qty, .q-thumb label { display: flex; flex-direction: column; gap: 2px; font-size: var(--fs-1); color: var(--ink-soft); }
+.q-qty input { border: 1px solid var(--line); background: var(--card); border-radius: var(--r-sm); padding: 4px 6px; width: 100%; min-width: 0; }
+.q-thumb input[type="range"] { width: 100%; accent-color: var(--gold); }
+.q-thumb small { display: flex; justify-content: space-between; }
+.q-thumb b { color: var(--ink); }
+.q-total { font-weight: 700; text-align: right; align-self: center; }
+.q-row .link { align-self: center; }
+.q-add { display: flex; gap: 6px; flex-wrap: wrap; }
+.q-sumrow { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); padding-top: var(--sp-3); font-size: var(--fs-4); }
+.q-sumrow b { font-size: var(--fs-6); font-weight: 500; }
+.q-prices summary { cursor: pointer; color: var(--ink-soft); font-size: var(--fs-2); }
+.q-prices[open] summary { margin-bottom: var(--sp-3); }
+@media (max-width: 560px) {
+  .q-row, .q-row:has(.q-thumb) { grid-template-columns: 1fr 64px 64px; }
+  .q-row .q-label { grid-column: 1 / -1; }
+  .q-row .q-thumb { grid-row: auto; grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -463,6 +525,7 @@ dialog form::before {
     <div class="title"><h1>Atelier Ledger</h1></div>
     <div class="actions">
       <button class="btn" id="new-commission" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>New commission</button>
+      <button class="btn ghost" id="quote" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5h10v13H5z"/><path d="M7.5 7h5M7.5 10h5M7.5 13h2.5"/></svg>Quote</button>
       <button class="btn ghost" id="new-client" type="button"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>Client</button>
     </div>
   </header>
@@ -492,7 +555,7 @@ dialog form::before {
 
   <footer class="foot">
     <span class="sync"><span class="dot off" id="sync-dot"></span><span id="sync-text">Saved in this browser only</span><button type="button" class="link" id="sync-open">Sync settings</button></span>
-    <label>Currency symbol <input id="currency" maxlength="4" value="$"></label>
+    <span class="foot-set"><label>Flag waits after <input id="wait-days" type="number" min="1" step="1" value="3"> days</label><label>Currency symbol <input id="currency" maxlength="4" value="$"></label></span>
   </footer>
 </div>
 
@@ -521,7 +584,7 @@ dialog form::before {
   const LEDGER_PATH = 'ledger.json';
 
   const state = {
-    clients: {}, commissions: {}, currency: '$', savedAt: '',
+    clients: {}, commissions: {}, currency: '$', savedAt: '', settings: {},
     filter: 'active', client: '', q: '',
     view: location.hash === '#clients' ? 'clients' : 'commissions',
     collapsed: new Set(), uploading: {},
@@ -563,6 +626,7 @@ dialog form::before {
     plus: I('<path d="M10 4v12M4 10h12"/>'),
     chevron: I('<path d="M5.5 8l4.5 4.5L14.5 8"/>'),
     glass: I('<path d="M6 3.5h8M6 16.5h8M7 4c0 4 6 4 6 12M13 4c0 4-6 4-6 12"/>'),
+    layers: I('<path d="M10 3.5l6.5 3.5L10 10.5 3.5 7z"/><path d="M3.5 10.5L10 14l6.5-3.5"/><path d="M3.5 13.5L10 17l6.5-3.5"/>'),
     stars: I('<path d="M8 3l1.3 3.7L13 8l-3.7 1.3L8 13l-1.3-3.7L3 8l3.7-1.3z"/><path d="M14.5 11.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
   };
   const INKPOT = `<svg viewBox="0 0 72 72" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 36h30l3 6v16a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V42z"/><path d="M27 36v-6h18v6"/><path d="M22 48h28"/><path d="M60 6C48 12 40 24 36 41"/><path d="M60 6c-1 10-8 20-20 26"/><path d="M58 46l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="currentColor" stroke="none"/><path d="M10 16l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor" stroke="none"/></svg>`;
@@ -764,7 +828,7 @@ dialog form::before {
   function showNotice(msg, kind) { const n = $('#notice'); n.textContent = msg; n.className = 'notice' + (kind === 'ok' ? ' ok' : ''); n.hidden = false; clearTimeout(showNotice.t); showNotice.t = setTimeout(() => { n.hidden = true; }, 8000); }
 
   /* ---------- local storage + changes ---------- */
-  function payload() { return { version: 2, savedAt: state.savedAt, currency: state.currency, clients: state.clients, commissions: state.commissions }; }
+  function payload() { return { version: 2, savedAt: state.savedAt, currency: state.currency, settings: state.settings, clients: state.clients, commissions: state.commissions }; }
   function saveLocal() { lsSet(LS_DATA, JSON.stringify(payload())); }
   function saveRepoMeta() { lsSet(LS_REPO, JSON.stringify({ token: repo.token, owner: repo.owner, name: repo.name, sha: repo.sha, dirty: repo.dirty })); }
   function saveFolds() { lsSet(LS_FOLD, JSON.stringify([...state.collapsed])); }
@@ -773,7 +837,9 @@ dialog form::before {
     state.commissions = d && d.commissions && typeof d.commissions === 'object' ? d.commissions : {};
     state.currency = (d && d.currency) || '$';
     state.savedAt = (d && d.savedAt) || '';
+    state.settings = d && d.settings && typeof d.settings === 'object' ? d.settings : {};
     $('#currency').value = state.currency;
+    $('#wait-days').value = settings().waitDays;
   }
   function commit() {
     state.savedAt = new Date().toISOString();
@@ -1124,6 +1190,10 @@ dialog form::before {
     if (shownWait !== null && n !== shownWait) { el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick'); }
     el.textContent = n ? String(n) : '';
     shownWait = n;
+    const today = todayStr(), limit = settings().waitDays;
+    const late = Object.values(state.commissions).some((c) => (c.pieces || []).some((p) => (p.steps || []).some((s) => s.status === 'waiting' && s.since && daysFrom(s.since, today) >= limit)));
+    el.classList.toggle('late', late);
+    el.title = late ? `Something has waited ${limit}+ days` : '';
   }
   /* While a waiting token is in flight the counter keeps its old number; it ticks when the token lands. */
   function renderCount() {
@@ -1237,6 +1307,7 @@ dialog form::before {
         <div class="actions">
           <button type="button" class="btn ghost small" data-act="add-piece" data-id="${esc(c.id)}">${ICON.plus}Add piece</button>
           <button type="button" class="btn ghost small" data-act="add-files" data-id="${esc(c.id)}">${ICON.plus}Add files</button>
+          <button type="button" class="btn ghost small" data-act="psd-export" data-id="${esc(c.id)}">${ICON.layers}Export PSD layers</button>
         </div>
         <button type="button" class="link" data-act="edit-commission" data-id="${esc(c.id)}">Edit commission</button>
       </div>
@@ -1265,12 +1336,13 @@ dialog form::before {
     let now = '';
     if (w) {
       const age = w.since ? daysFrom(w.since, today) : 0;
-      now = `<span class="now wait">${esc(w.name)} · waiting ${age === 0 ? 'since today' : age + (age === 1 ? ' day' : ' days')}${w.note ? ' — ' + esc(w.note) : ''}</span>`;
+      const late = age >= settings().waitDays;
+      now = `<span class="now wait${late ? ' late' : ''}">${esc(w.name)} · waiting ${age === 0 ? 'since today' : age + (age === 1 ? ' day' : ' days')}${late ? ' · follow up' : ''}${w.note ? ' — ' + esc(w.note) : ''}</span>`;
     } else if (cur && cur.step.note) {
       now = `<span class="now">${esc(cur.step.name)}: ${esc(cur.step.note)}</span>`;
     }
     const steps = (p.steps || []).map((s, i) => `
-      <button type="button" class="step" data-status="${esc(s.status)}" data-act="step" data-c="${esc(c.id)}" data-p="${esc(p.id)}" data-i="${i}"
+      <button type="button" class="step${s.status === 'waiting' && s.since && daysFrom(s.since, today) >= settings().waitDays ? ' late' : ''}" data-status="${esc(s.status)}" data-act="step" data-c="${esc(c.id)}" data-p="${esc(p.id)}" data-i="${i}"
         aria-label="${esc(s.name)}: ${esc(STATUS_LABEL[s.status] || '')}" title="${esc(s.name)}: ${esc(STATUS_LABEL[s.status] || '')}${s.note ? ' — ' + esc(s.note) : ''}">
         ${ring(s.status)}<span>${esc(s.name)}</span></button>`).join('');
     return `
@@ -1394,6 +1466,8 @@ dialog form::before {
     form.innerHTML = html;
     form._onDelete = null;
     form._onDownload = null;
+    form.oninput = null;
+    form.onclick = null;
     dlg.classList.toggle('wide', !!wide);
     onSubmit = submit;
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
@@ -1661,6 +1735,626 @@ dialog form::before {
     });
   }
 
+
+  /* ---------- PSD layer export ----------
+     ag-psd reads the file; it does not merge layers, so the merging below is ours.
+     It follows the W3C compositing formulas that PSD blending is built on, and was checked
+     pixel-for-pixel against psd-tools (a Python PSD library that does merge) on real files. */
+  const AGPSD_SRC = 'https://cdn.jsdelivr.net/npm/ag-psd@34.1.0/dist/bundle.js';
+  const FFLATE_SRC = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
+  const scriptLoads = {};
+  function loadScript(src) {
+    if (!scriptLoads[src]) scriptLoads[src] = new Promise((ok, no) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = ok; s.onerror = () => { delete scriptLoads[src]; no(new Error('Couldn’t load ' + src)); };
+      document.head.appendChild(s);
+    });
+    return scriptLoads[src];
+  }
+
+  const BLEND = {
+    normal: (b, s) => s,
+    multiply: (b, s) => b * s,
+    screen: (b, s) => b + s - b * s,
+    overlay: (b, s) => (b <= 0.5 ? 2 * b * s : 1 - 2 * (1 - b) * (1 - s)),
+    darken: Math.min,
+    lighten: Math.max,
+    'color dodge': (b, s) => (b === 0 ? 0 : s >= 1 ? 1 : Math.min(1, b / (1 - s))),
+    'color burn': (b, s) => (b >= 1 ? 1 : s <= 0 ? 0 : 1 - Math.min(1, (1 - b) / s)),
+    'hard light': (b, s) => (s <= 0.5 ? 2 * b * s : 1 - 2 * (1 - b) * (1 - s)),
+    'soft light': (b, s) => {
+      if (s <= 0.5) return b - (1 - 2 * s) * b * (1 - b);
+      const d = b <= 0.25 ? ((16 * b - 12) * b + 4) * b : Math.sqrt(b);
+      return b + (2 * s - 1) * (d - b);
+    },
+    difference: (b, s) => Math.abs(b - s),
+    exclusion: (b, s) => b + s - 2 * b * s,
+    'linear dodge': (b, s) => Math.min(1, b + s),
+    'linear burn': (b, s) => Math.max(0, b + s - 1),
+    subtract: (b, s) => Math.max(0, b - s),
+    divide: (b, s) => (s === 0 ? (b === 0 ? 0 : 1) : Math.min(1, b / s)),
+  };
+
+  /* A buffer is unpremultiplied RGBA floats (0–1) covering box [x0, y0, x1, y1) of the canvas. */
+  function newBuf(box) { const w = box[2] - box[0], h = box[3] - box[1]; return { box, w, h, px: new Float32Array(w * h * 4) }; }
+  function boxOf(layer) { return [layer.left || 0, layer.top || 0, layer.right || 0, layer.bottom || 0]; }
+  function unionBox(a, b) { return !a ? b : !b ? a : [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]; }
+  function emptyBox(b) { return !b || b[2] <= b[0] || b[3] <= b[1]; }
+
+  /* Visible content box of a node, as it would be drawn inside an export. */
+  function contentBox(node) {
+    if (node.children) {
+      let box = null;
+      eachDrawn(node.children, (l) => { box = unionBox(box, contentBox(l)); });
+      return box;
+    }
+    const b = boxOf(node);
+    return emptyBox(b) || !node.imageData ? null : b;
+  }
+  /* Calls fn for each child that is drawn: skips hidden layers and anything clipped to a hidden base. */
+  function eachDrawn(children, fn) {
+    let baseHidden = false;
+    for (const l of children) {
+      if (!l.clipping) baseHidden = !!l.hidden;
+      if (l.hidden || (l.clipping && baseHidden)) continue;
+      fn(l);
+    }
+  }
+
+  function layerBuf(layer, box, warn) {
+    const buf = newBuf(box);
+    const id = layer.imageData;
+    if (!id) { if (layer.adjustment || layer.vectorFill) warn.add('adjustment or fill layers are skipped'); return buf; }
+    if (layer.effects && !layer.effects.disabled) warn.add('layer effects (drop shadow, stroke…) are not drawn');
+    const max = id.data instanceof Uint16Array ? 65535 : id.data instanceof Float32Array ? 1 : 255;
+    const lx = layer.left || 0, ly = layer.top || 0;
+    const m = layer.mask && !layer.mask.disabled && layer.mask.imageData ? layer.mask : null;
+    const mmax = m ? (m.imageData.data instanceof Uint16Array ? 65535 : m.imageData.data instanceof Float32Array ? 1 : 255) : 1;
+    for (let y = Math.max(ly, box[1]); y < Math.min(ly + id.height, box[3]); y++) {
+      for (let x = Math.max(lx, box[0]); x < Math.min(lx + id.width, box[2]); x++) {
+        const si = ((y - ly) * id.width + (x - lx)) * 4, di = ((y - box[1]) * buf.w + (x - box[0])) * 4;
+        let a = id.data[si + 3] / max;
+        if (m) {
+          const mx = x - (m.left || 0), my = y - (m.top || 0);
+          const inside = mx >= 0 && my >= 0 && mx < m.imageData.width && my < m.imageData.height;
+          a *= inside ? m.imageData.data[(my * m.imageData.width + mx) * 4] / mmax : (m.defaultColor ?? 255) / 255;
+        }
+        buf.px[di] = id.data[si] / max; buf.px[di + 1] = id.data[si + 1] / max; buf.px[di + 2] = id.data[si + 2] / max; buf.px[di + 3] = a;
+      }
+    }
+    return buf;
+  }
+
+  /* Draws src onto dst. atop = clipping: the result keeps dst's alpha. */
+  function drawOnto(dst, src, mode, opacity, atop) {
+    const f = BLEND[mode] || BLEND.normal;
+    const d = dst.px, s = src.px, n = d.length;
+    for (let i = 0; i < n; i += 4) {
+      const as = s[i + 3] * opacity;
+      if (as <= 0) continue;
+      const ab = d[i + 3];
+      if (atop && ab <= 0) continue;
+      const ao = atop ? ab : as + ab * (1 - as);
+      for (let c = 0; c < 3; c++) {
+        const cb = d[i + c], cs = s[i + c];
+        // inside a clipping group the base counts as opaque for blending; its alpha only masks the result
+        const mixed = atop ? f(cb, cs) : (1 - ab) * cs + ab * f(cb, cs);
+        d[i + c] = atop ? as * mixed + (1 - as) * cb : (as * mixed + ab * (1 - as) * cb) / ao;
+      }
+      d[i + 3] = ao;
+    }
+  }
+
+  function renderChildren(children, box, warn) {
+    const out = newBuf(box);
+    let base = null, baseNode = null, group = null;
+    const flush = () => { if (group) { drawOnto(out, group, modeOf(baseNode, warn), opacityOf(baseNode), false); group = null; } };
+    eachDrawn(children, (l) => {
+      if (l.clipping && group) {
+        drawOnto(group, renderNode(l, box, warn), modeOf(l, warn), opacityOf(l), true);
+        return;
+      }
+      flush();
+      baseNode = l;
+      base = renderNode(l, box, warn);
+      group = base;
+    });
+    flush();
+    return out;
+  }
+  function renderNode(node, box, warn) { return node.children ? renderChildren(node.children, box, warn) : layerBuf(node, box, warn); }
+  function opacityOf(l) { return l.opacity ?? 1; }
+  function modeOf(l, warn) {
+    const m = l.blendMode || 'normal';
+    if (m === 'pass through') return 'normal';
+    if (!BLEND[m]) { warn.add(`“${m}” blend mode is drawn as normal`); return 'normal'; }
+    return m;
+  }
+
+  /* An export unit is drawn whatever its own visibility and opacity; what's inside keeps theirs. */
+  function renderUnit(node, warn) {
+    const box = node.children ? contentBox(node) : (node.imageData ? boxOf(node) : null);
+    if (emptyBox(box)) return null;
+    return node.children ? renderChildren(node.children, box, warn) : layerBuf(node, box, warn);
+  }
+  function bufToCanvas(buf, fullW, fullH) {
+    const cv = document.createElement('canvas');
+    cv.width = fullW || buf.w; cv.height = fullH || buf.h;
+    const img = new ImageData(buf.w, buf.h);
+    for (let i = 0; i < buf.px.length; i++) img.data[i] = Math.round(buf.px[i] * 255);
+    cv.getContext('2d').putImageData(img, fullW ? buf.box[0] : 0, fullW ? buf.box[1] : 0);
+    return cv;
+  }
+
+  /* ---------- export units ---------- */
+  function fileSafe(s) { return String(s).normalize('NFKC').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^[_.]+|[_.]+$/g, ''); }
+  /* Every folder (any depth) plus loose layers at the top level. Leaf folders are ticked by default. */
+  function listUnits(psd) {
+    const units = [];
+    const walk = (children, path, depth) => {
+      const seen = {};
+      for (let i = children.length - 1; i >= 0; i--) {
+        const l = children[i];
+        const nm = l.name || (l.children ? 'Folder' : 'Layer');
+        seen[nm] = (seen[nm] || 0) + 1;
+        const key = [...path.map((p) => p.key), nm + (seen[nm] > 1 ? '#' + seen[nm] : '')].join('/');
+        if (l.children) {
+          const hasSub = l.children.some((c) => c.children);
+          units.push({ node: l, key, depth, folder: true, label: nm, defName: [...path.map((p) => p.name), nm].map(fileSafe).filter(Boolean).join('_'), defOn: !hasSub && !emptyBox(contentBox(l)) });
+          walk(l.children, [...path, { key: nm + (seen[nm] > 1 ? '#' + seen[nm] : ''), name: nm }], depth + 1);
+        } else if (depth === 0 && l.imageData && !emptyBox(boxOf(l))) {
+          units.push({ node: l, key, depth, folder: false, label: nm, defName: fileSafe(nm), defOn: false });
+        }
+      }
+    };
+    walk(psd.children || [], [], 0);
+    return units;
+  }
+
+  async function psdExportDialog(cid, file) {
+    const c = state.commissions[cid];
+    if (!c) return;
+    if (file.size > 300 * 1024 * 1024) { showNotice('That PSD is over 300 MB, which is too big to open in the browser.'); return; }
+    openDialog(`
+      <h2>Export layers from “${esc(file.name)}”</h2>
+      <p class="hint" id="px-status"><span class="spin" aria-hidden="true"></span> Reading the PSD…</p>
+      <div class="dfoot"><button type="button" class="btn ghost" data-cancel>Cancel</button></div>`, null, true);
+    let psd;
+    try {
+      await loadScript(AGPSD_SRC);
+      const buffer = await file.arrayBuffer();
+      await new Promise((r) => setTimeout(r, 30));
+      psd = agPsd.readPsd(buffer, { useImageData: true, skipCompositeImageData: true, skipThumbnail: true });
+    } catch (e) {
+      const st = $('#px-status', form);
+      if (st) st.textContent = /load/.test(e.message) ? 'Couldn’t load the PSD reader. Check your connection and try again.' : 'Couldn’t read this file as a PSD.';
+      return;
+    }
+    if (!dlg.open) return;
+    const memo = (c.psdExport ||= { prefix: '', files: {} });
+    const saved = memo.files[file.name] || {};
+    const units = listUnits(psd).map((u) => ({ ...u, on: saved[u.key] ? saved[u.key].on : u.defOn, name: saved[u.key]?.name || u.defName }));
+    const prefix = memo.prefix || fileSafe(`${clientName(c.clientId)}_${c.title}`);
+    if (!units.length) { $('#px-status', form).textContent = 'This PSD has no folders or loose layers to export.'; return; }
+    form.innerHTML = `
+      <h2>Export layers from “${esc(file.name)}”</h2>
+      <p class="hint">Each ticked row becomes one PNG at full canvas size (${psd.width} × ${psd.height}). A folder is merged with everything visible inside it, even if the folder itself is hidden. Names come from folder names; edit any of them here.</p>
+      <label class="field"><span>Every file name starts with</span><input id="px-prefix" class="mono" value="${esc(prefix)}" spellcheck="false"></label>
+      <div class="px-mode">
+        <div class="tabs" role="group" aria-label="What to export">
+          <button type="button" data-px="mode-clean" aria-pressed="${!memo.preview}">Clean files</button>
+          <button type="button" data-px="mode-preview" aria-pressed="${!!memo.preview}">Watermarked previews</button>
+        </div>
+        <label class="px-check"><input type="checkbox" id="px-sheet" ${memo.sheet === false ? '' : 'checked'}> Add an overview sheet</label>
+      </div>
+      <div class="px-wm" id="px-wm" ${memo.preview ? '' : 'hidden'}>
+        <span class="px-stamp" id="px-stamp"></span>
+        <div class="px-wm-text">
+          <span id="px-wm-status"></span>
+          <span class="px-wm-row">
+            <label>Size <select id="px-scale">${[[0.5, '50%'], [0.35, '35%'], [0.25, '25%'], [1, 'Full size']].map(([v, l]) => `<option value="${v}"${(memo.scale || 0.5) == v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+            <button type="button" class="link" data-px="stamp">Change watermark image</button>
+          </span>
+        </div>
+      </div>
+      <div class="px-tools">
+        <span id="px-count"></span>
+        <span class="spacer"></span>
+        <button type="button" class="link" data-px="default">Default picks</button>
+        <button type="button" class="link" data-px="all">All</button>
+        <button type="button" class="link" data-px="none">None</button>
+      </div>
+      <ul class="px-list">${units.map((u, i) => `
+        <li class="px-row${u.on ? ' on' : ''}" style="--depth:${u.depth}" data-i="${i}">
+          <input type="checkbox" aria-label="Export ${esc(u.label)}" ${u.on ? 'checked' : ''}>
+          <span class="px-thumb loading" data-i="${i}"></span>
+          <span class="px-label"><span class="px-src">${u.folder ? '' : 'Layer · '}${esc(u.label)}</span><span class="px-name"><input value="${esc(u.name)}" spellcheck="false" aria-label="File name for ${esc(u.label)}"><span>.png</span></span><span class="px-warn" hidden></span></span>
+        </li>`).join('')}
+      </ul>
+      <p class="err" hidden></p>
+      <div class="dfoot">
+        <span class="hint" id="px-progress"></span>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" data-cancel>Cancel</button>
+        ${connected() ? '<button type="button" class="btn ghost" data-px="save">Save to files</button>' : ''}
+        <button type="button" class="btn" data-px="zip">Download .zip</button>
+      </div>`;
+    const rows = [...form.querySelectorAll('.px-row')];
+    const fullName = (u) => `${fileSafe($('#px-prefix', form).value)}${$('#px-prefix', form).value.trim() ? '_' : ''}${fileSafe(u.name) || 'untitled'}.png`;
+    const count = () => {
+      const n = units.filter((u) => u.on).length;
+      $('#px-count', form).textContent = `${n} of ${units.length} selected`;
+    };
+    count();
+    form.oninput = (e) => {
+      const row = e.target.closest('.px-row');
+      if (!row) return;
+      const u = units[row.dataset.i];
+      if (e.target.type === 'checkbox') { u.on = e.target.checked; row.classList.toggle('on', u.on); count(); }
+      else u.name = e.target.value;
+    };
+
+    const drawStamp = () => {
+      const wm = settings().watermark;
+      $('#px-stamp', form).innerHTML = wm ? `<img src="${wm}" alt="Your watermark">` : '';
+      $('#px-wm-status', form).textContent = wm
+        ? 'Your watermark is tiled across the art at different sizes and angles, with the client’s name and the date in fine text, on a smaller copy.'
+        : 'Add your watermark image (a PNG with a transparent background works best).';
+      form.querySelector('[data-px="stamp"]').textContent = wm ? 'Change watermark image' : 'Add watermark image';
+    };
+    drawStamp();
+    const preview = () => form.querySelector('[data-px="mode-preview"]').getAttribute('aria-pressed') === 'true';
+
+    /* thumbnails render one at a time as rows scroll into view */
+    const warnings = new Map();
+    const thumbQueue = [];
+    let thumbBusy = false;
+    const pump = () => {
+      if (thumbBusy || !thumbQueue.length || !dlg.open) return;
+      thumbBusy = true;
+      const i = thumbQueue.shift();
+      setTimeout(() => {
+        const u = units[i], warn = new Set();
+        const buf = renderUnit(u.node, warn);
+        const el = form.querySelector(`.px-thumb[data-i="${i}"]`);
+        if (el) {
+          el.classList.remove('loading');
+          if (buf) { const cv = bufToCanvas(buf); el.appendChild(cv); } else el.textContent = 'Empty';
+          if (warn.size) { const w = el.parentElement.querySelector('.px-warn'); w.textContent = [...warn].join(' · '); w.hidden = false; }
+        }
+        warnings.set(i, warn);
+        thumbBusy = false;
+        pump();
+      }, 0);
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) if (en.isIntersecting) { io.unobserve(en.target); thumbQueue.push(+en.target.dataset.i); }
+      pump();
+    }, { root: form.querySelector('.px-list') });
+    form.querySelectorAll('.px-thumb').forEach((t) => io.observe(t));
+    dlg.addEventListener('close', () => io.disconnect(), { once: true });
+
+    const remember = () => {
+      memo.prefix = $('#px-prefix', form).value.trim();
+      memo.preview = preview();
+      memo.sheet = $('#px-sheet', form).checked;
+      memo.scale = Number($('#px-scale', form).value);
+      memo.files[file.name] = Object.fromEntries(units.map((u) => [u.key, { on: u.on, name: u.name }]));
+      c.updatedAt = new Date().toISOString();
+      commit();
+    };
+    const build = async (btn) => {
+      const picked = units.filter((u) => u.on);
+      if (!picked.length) return null;
+      const out = [], used = new Set(), sheetItems = [];
+      const pv = preview(), wmOpts = { stamp: settings().watermark, text: `PREVIEW · ${clientName(c.clientId)} · ${todayStr()}`, scale: Number($('#px-scale', form).value) || 0.5 };
+      const tag = pv ? '_preview' : '';
+      btn.classList.add('busy'); form.querySelectorAll('[data-px]').forEach((b) => { b.disabled = true; });
+      try {
+        for (const [k, u] of picked.entries()) {
+          $('#px-progress', form).textContent = `Drawing ${k + 1} of ${picked.length}…`;
+          await new Promise((r) => setTimeout(r, 0));
+          const buf = renderUnit(u.node, new Set());
+          if (!buf) continue;
+          const base = fullName(u).replace(/\.png$/, tag + '.png');
+          let name = base, n = 2;
+          while (used.has(name.toLowerCase())) name = base.replace(/\.png$/, `_${n++}.png`);
+          used.add(name.toLowerCase());
+          let cv = bufToCanvas(buf, psd.width, psd.height);
+          if (pv) cv = await watermarkCanvas(cv, { ...wmOpts, seed: name });
+          const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
+          out.push(new File([blob], name, { type: 'image/png' }));
+          if ($('#px-sheet', form).checked) {
+            let crop = bufToCanvas(buf);
+            if (pv) crop = await watermarkCanvas(crop, { ...wmOpts, scale: 1, seed: name + 'sheet' });
+            sheetItems.push({ name: name.replace(/\.png$/, ''), canvas: crop, box: [0, 0, crop.width, crop.height] });
+          }
+        }
+        if (sheetItems.length) {
+          $('#px-progress', form).textContent = 'Drawing the overview sheet…';
+          await new Promise((r) => setTimeout(r, 0));
+          const pfx = fileSafe($('#px-prefix', form).value);
+          const sheet = await overviewSheet(sheetItems, (pfx || file.name).replace(/_/g, ' '));
+          const blob = await new Promise((r) => sheet.toBlob(r, 'image/png'));
+          out.unshift(new File([blob], `${pfx ? pfx + '_' : ''}overview${tag}.png`, { type: 'image/png' }));
+        }
+      } finally {
+        btn.classList.remove('busy'); form.querySelectorAll('[data-px]').forEach((b) => { b.disabled = false; });
+        $('#px-progress', form).textContent = '';
+      }
+      return out;
+    };
+    form.onclick = async (e) => {
+      const b = e.target.closest('[data-px]');
+      if (!b) return;
+      e.preventDefault();
+      const act = b.dataset.px;
+      if (act === 'mode-clean' || act === 'mode-preview') {
+        form.querySelector('[data-px="mode-clean"]').setAttribute('aria-pressed', String(act === 'mode-clean'));
+        form.querySelector('[data-px="mode-preview"]').setAttribute('aria-pressed', String(act === 'mode-preview'));
+        $('#px-wm', form).hidden = act === 'mode-clean';
+        return;
+      }
+      if (act === 'stamp') {
+        const input = $('#file-input');
+        input.value = ''; input.accept = 'image/*'; input.multiple = false;
+        input.onchange = async () => { input.accept = ''; input.multiple = true; if (input.files[0]) { await setWatermarkFromFile(input.files[0]); if (dlg.open) drawStamp(); } };
+        input.click();
+        return;
+      }
+      if (act === 'default' || act === 'all' || act === 'none') {
+        units.forEach((u, i) => { u.on = act === 'all' ? true : act === 'none' ? false : u.defOn; rows[i].classList.toggle('on', u.on); rows[i].querySelector('input[type="checkbox"]').checked = u.on; });
+        count();
+        return;
+      }
+      const err = $('.err', form);
+      if (preview() && !settings().watermark) { err.textContent = 'Add your watermark image first, or switch to clean files.'; err.hidden = false; return; }
+      const files = await build(b);
+      if (!files) { err.textContent = 'Tick at least one row to export.'; err.hidden = false; return; }
+      if (!files.length) { err.textContent = 'Everything ticked is empty, so there was nothing to export.'; err.hidden = false; return; }
+      remember();
+      if (act === 'zip') {
+        await loadScript(FFLATE_SRC).catch(() => null);
+        if (!window.fflate) { err.textContent = 'Couldn’t load the zip tool. Check your connection and try again.'; err.hidden = false; return; }
+        const entries = {};
+        for (const f of files) entries[f.name] = [new Uint8Array(await f.arrayBuffer()), { level: 0 }];
+        const zip = new Blob([fflate.zipSync(entries)], { type: 'application/zip' });
+        const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(zip), download: `${fileSafe($('#px-prefix', form).value) || 'export'}${preview() ? '_previews' : ''}.zip` });
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+        closeDialog();
+        const skipped = units.filter((u) => u.on).length - files.filter((f) => !/_overview(_preview)?\.png$/.test(f.name)).length;
+        const nPng = files.filter((f) => !/_overview(_preview)?\.png$/.test(f.name)).length, hasSheet = nPng !== files.length;
+        showNotice(`Exported ${nPng} ${preview() ? 'watermarked ' : ''}${nPng === 1 ? 'PNG' : 'PNGs'}${hasSheet ? ' and an overview sheet' : ''} from ${file.name}.${skipped ? ` ${skipped} ticked ${skipped === 1 ? 'row was' : 'rows were'} empty (everything inside hidden) and left out.` : ''}`, 'ok');
+      } else {
+        closeDialog();
+        uploadFiles(cid, files);
+      }
+    };
+  }
+  function pickPsd(cid) {
+    const input = $('#file-input');
+    input.value = '';
+    input.accept = '.psd,.psb';
+    input.multiple = false;
+    input.onchange = () => { input.accept = ''; input.multiple = true; if (input.files[0]) psdExportDialog(cid, input.files[0]); };
+    input.click();
+  }
+
+
+  /* ---------- settings (synced with the ledger) ---------- */
+  const DEFAULT_PRICES = { face: 10, feature: 1.5, icon: 10, thumbMin: 30, thumbMax: 100, extraCharacter: 10 };
+  function settings() {
+    const s = (state.settings ||= {});
+    s.prices = { ...DEFAULT_PRICES, ...(s.prices || {}) };
+    if (!(s.waitDays > 0)) s.waitDays = 3;
+    return s;
+  }
+  const cash = (n) => state.currency + ((Number(n) || 0) % 1 ? (Number(n) || 0).toFixed(2) : String(Number(n) || 0));
+
+  /* ---------- watermark ---------- */
+  const imgCache = new Map();
+  function loadImg(src) {
+    if (!imgCache.has(src)) imgCache.set(src, new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = src; }));
+    return imgCache.get(src);
+  }
+  /* Stored small, as a data URL inside the ledger, so it syncs to both computers. */
+  async function setWatermarkFromFile(file) {
+    const img = await loadImg(URL.createObjectURL(file));
+    const k = Math.min(1, 600 / Math.max(img.width, img.height));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    settings().watermark = cv.toDataURL('image/png');
+    commit();
+  }
+  function seeded(seed) {
+    let a = 0;
+    for (const ch of String(seed)) a = (a * 31 + ch.charCodeAt(0)) | 0;
+    return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  /* Many stamps of different sizes, angles and strengths, dark and light, drawn only on the art itself,
+     plus a fine line of text across it, on a smaller copy. Nothing is unremovable; this makes removal slow and the result small. */
+  async function watermarkCanvas(src, opts) {
+    const scale = opts.scale || 0.5;
+    const W = Math.max(1, Math.round(src.width * scale)), H = Math.max(1, Math.round(src.height * scale));
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d');
+    g.drawImage(src, 0, 0, W, H);
+    const rnd = seeded(opts.seed || 'atelier');
+    // sized to the art itself, not the canvas, so a small eye gets as many marks as a full face
+    const a = g.getImageData(0, 0, W, H).data;
+    let x0 = W, y0 = H, x1 = -1, y1 = -1;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (a[(y * W + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 < 0) return cv;
+    const bw = x1 - x0 + 1, bh = y1 - y0 + 1, span0 = Math.max(bw, bh);
+    g.globalCompositeOperation = 'source-atop';
+    if (opts.stamp) {
+      const stamp = await loadImg(opts.stamp);
+      const light = document.createElement('canvas'); light.width = stamp.width; light.height = stamp.height;
+      const lg = light.getContext('2d'); lg.drawImage(stamp, 0, 0); lg.globalCompositeOperation = 'source-in'; lg.fillStyle = '#fff'; lg.fillRect(0, 0, light.width, light.height);
+      const step = Math.max(36, span0 / 3.2);
+      for (let row = 0, y = y0 - step / 3; y < y1 + step / 2; y += step * 0.55, row++) {
+        for (let x = x0 - step / 3 + (row % 2 ? step * 0.45 : 0); x < x1 + step / 2; x += step * 0.9) {
+          const sz = step * (0.75 + rnd() * 0.5);
+          g.save();
+          g.translate(x + (rnd() - 0.5) * step * 0.3, y + (rnd() - 0.5) * step * 0.3);
+          g.rotate((-20 + (rnd() - 0.5) * 40) * Math.PI / 180);
+          g.globalAlpha = 0.22 + rnd() * 0.2;
+          g.drawImage(rnd() < 0.5 ? stamp : light, -sz / 2, -sz / 2, sz, sz * stamp.height / stamp.width);
+          g.restore();
+        }
+      }
+    }
+    if (opts.text) {
+      const fs = Math.max(7, Math.round(span0 / 34));
+      g.save();
+      g.font = `600 ${fs}px ${getComputedStyle(document.body).fontFamily}`;
+      g.globalAlpha = 0.28;
+      g.translate(x0 + bw / 2, y0 + bh / 2); g.rotate(-30 * Math.PI / 180);
+      const line = (opts.text + '   ·   ').repeat(40);
+      const span = Math.hypot(bw, bh) + fs * 4;
+      for (let y = -span / 2, k = 0; y < span / 2; y += fs * 3.2, k++) {
+        g.fillStyle = k % 2 ? '#ffffff' : '#141a30';
+        g.fillText(line, -span - (k % 3) * fs * 4, y);
+      }
+      g.restore();
+    }
+    return cv;
+  }
+
+  /* ---------- overview sheet ---------- */
+  async function overviewSheet(items, title) {
+    const cols = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(items.length)))), tile = 340, pad = 24, label = 46, head = 84;
+    const rows = Math.ceil(items.length / cols);
+    const cv = document.createElement('canvas');
+    cv.width = pad + cols * (tile + pad); cv.height = head + rows * (tile + label + pad) + pad;
+    const g = cv.getContext('2d');
+    const font = getComputedStyle(document.body).fontFamily;
+    g.fillStyle = '#f4efe3'; g.fillRect(0, 0, cv.width, cv.height);
+    g.fillStyle = '#1c2440'; g.font = `500 28px ${font}`; g.fillText(title, pad, 46);
+    g.fillStyle = '#454d69'; g.font = `400 16px ${font}`; g.fillText(`${items.length} ${items.length === 1 ? 'file' : 'files'} · ${new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`, pad, 70);
+    items.forEach((it, i) => {
+      const x = pad + (i % cols) * (tile + pad), y = head + Math.floor(i / cols) * (tile + label + pad);
+      for (let cy = 0; cy < tile; cy += 14) for (let cx = 0; cx < tile; cx += 14) { g.fillStyle = ((cx + cy) / 14) % 2 ? '#e2d9c5' : '#ebe3d1'; g.fillRect(x + cx, y + cy, Math.min(14, tile - cx), Math.min(14, tile - cy)); }
+      const b = it.box, w = b[2] - b[0], h = b[3] - b[1], k = Math.min((tile - 20) / w, (tile - 20) / h, 4);
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(it.canvas, b[0], b[1], w, h, x + (tile - w * k) / 2, y + (tile - h * k) / 2, w * k, h * k);
+      g.fillStyle = '#1c2440'; g.font = `500 15px ${font}`;
+      let name = it.name;
+      while (g.measureText(name).width > tile && name.length > 4) name = name.slice(0, -2);
+      if (name !== it.name) name = name.slice(0, -1) + '…';
+      g.fillText(name, x, y + tile + 26);
+    });
+    return cv;
+  }
+
+  /* ---------- quote calculator ---------- */
+  const QUOTE_KINDS = {
+    face: { label: 'Face', price: (p) => p.face },
+    icon: { label: 'Icon', price: (p) => p.icon },
+    thumb: { label: 'Thumbnail', price: (p) => p.thumbMin },
+    other: { label: 'Other', price: () => 0 },
+  };
+  let quoteRows = null;
+  function quoteRowTotal(r, p) {
+    if (r.kind === 'thumb') return (Number(r.level) + (Number(r.extra) || 0) * p.extraCharacter) * (Number(r.qty) || 0);
+    return (Number(r.unit) || 0) * (Number(r.qty) || 0) + (r.kind === 'face' ? (Number(r.marks) || 0) * p.feature : 0);
+  }
+  function quoteDialog() {
+    const p = settings().prices;
+    if (!quoteRows) quoteRows = [{ kind: 'face', label: QUOTE_KINDS.face.label, qty: 1, unit: p.face }];
+    const rowHtml = (r, i) => r.kind === 'thumb' ? `
+      <li class="q-row" data-i="${i}">
+        <input class="q-label" value="${esc(r.label)}" aria-label="Item">
+        <label class="q-qty"><span>Qty</span><input type="number" min="0" step="1" value="${esc(r.qty)}" data-k="qty"></label>
+        <div class="q-thumb">
+          <label><span>Rendering <b>${cash(r.level)}</b></span><input type="range" min="${p.thumbMin}" max="${p.thumbMax}" step="5" value="${esc(r.level)}" data-k="level"><small><span>Simple</span><span>Fully rendered (~24 h)</span></small></label>
+          <label class="q-qty"><span>Extra characters</span><input type="number" min="0" step="1" value="${esc(r.extra || 0)}" data-k="extra"></label>
+        </div>
+        <span class="q-total">${cash(quoteRowTotal(r, p))}</span>
+        <button type="button" class="link" data-q="del" aria-label="Remove ${esc(r.label)}">Remove</button>
+      </li>` : `
+      <li class="q-row" data-i="${i}">
+        <input class="q-label" value="${esc(r.label)}" aria-label="Item">
+        <label class="q-qty"><span>Qty</span><input type="number" min="0" step="1" value="${esc(r.qty)}" data-k="qty"></label>
+        <label class="q-qty"><span>Each (${esc(state.currency)})</span><input type="number" min="0" step="0.5" value="${esc(r.unit)}" data-k="unit"></label>
+        <span class="q-total">${cash(quoteRowTotal(r, p))}</span>
+        <button type="button" class="link" data-q="del" aria-label="Remove ${esc(r.label)}">Remove</button>
+        ${r.kind === 'face' ? `<div class="q-extras"><label class="q-qty"><span>Scars / markings, in total (${cash(p.feature)} each)</span><input type="number" min="0" step="1" value="${esc(r.marks || 0)}" data-k="marks"></label></div>` : ''}
+      </li>`;
+    const total = () => quoteRows.reduce((s, r) => s + quoteRowTotal(r, p), 0);
+    const draw = () => {
+      $('#q-list', form).innerHTML = quoteRows.map(rowHtml).join('') || '<li class="hint">Add an item below.</li>';
+      $('#q-sum', form).textContent = cash(total());
+    };
+    openDialog(`
+      <h2>Price a commission</h2>
+      <ul class="q-list" id="q-list"></ul>
+      <div class="q-add">
+        ${Object.entries(QUOTE_KINDS).map(([k, v]) => `<button type="button" class="btn ghost small" data-q="add" data-kind="${k}">${ICON.plus}${esc(v.label)}</button>`).join('')}
+      </div>
+      <div class="q-sumrow"><span>Total</span><b id="q-sum"></b></div>
+      <details class="q-prices">
+        <summary>Your prices</summary>
+        <div class="grid3">
+          <label class="field"><span>Face</span><input type="number" min="0" step="0.5" data-price="face" value="${p.face}"></label>
+          <label class="field"><span>Each scar / marking</span><input type="number" min="0" step="0.5" data-price="feature" value="${p.feature}"></label>
+          <label class="field"><span>Icon (from)</span><input type="number" min="0" step="0.5" data-price="icon" value="${p.icon}"></label>
+          <label class="field"><span>Thumbnail from</span><input type="number" min="0" step="5" data-price="thumbMin" value="${p.thumbMin}"></label>
+          <label class="field"><span>Thumbnail up to</span><input type="number" min="0" step="5" data-price="thumbMax" value="${p.thumbMax}"></label>
+          <label class="field"><span>Each extra character</span><input type="number" min="0" step="0.5" data-price="extraCharacter" value="${p.extraCharacter}"></label>
+        </div>
+        <p class="hint">New items start at these prices. Changes are saved.</p>
+      </details>
+      <p class="err" hidden></p>
+      <div class="dfoot">
+        <button type="button" class="link" data-q="clear">Start over</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-q="copy">Copy quote</button>
+
+      </div>`, null);
+    draw();
+    form.oninput = (e) => {
+      const pk = e.target.dataset.price;
+      if (pk) { p[pk] = Math.max(0, Number(e.target.value) || 0); settings().prices = p; clearTimeout(quoteDialog.t); quoteDialog.t = setTimeout(commit, 600); return; }
+      const row = e.target.closest('.q-row');
+      if (!row) return;
+      const r = quoteRows[row.dataset.i];
+      if (e.target.classList.contains('q-label')) { r.label = e.target.value; return; }
+      r[e.target.dataset.k] = e.target.value;
+      row.querySelector('.q-total').textContent = cash(quoteRowTotal(r, p));
+      if (e.target.dataset.k === 'level') row.querySelector('.q-thumb b').textContent = cash(r.level);
+      $('#q-sum', form).textContent = cash(total());
+    };
+    form.onclick = async (e) => {
+      const b = e.target.closest('[data-q]');
+      if (!b) return;
+      e.preventDefault();
+      const act = b.dataset.q;
+      if (act === 'add') {
+        const k = b.dataset.kind;
+        quoteRows.push(k === 'thumb' ? { kind: k, label: QUOTE_KINDS.thumb.label, qty: 1, level: p.thumbMin, extra: 0 } : { kind: k, label: k === 'other' ? '' : QUOTE_KINDS[k].label, qty: 1, unit: QUOTE_KINDS[k].price(p) });
+        draw();
+        const rows = form.querySelectorAll('.q-row'); rows[rows.length - 1]?.querySelector(k === 'other' ? '.q-label' : 'input[data-k="qty"]')?.focus();
+      } else if (act === 'del') { quoteRows.splice(+b.closest('.q-row').dataset.i, 1); draw(); }
+      else if (act === 'clear') { quoteRows = []; draw(); }
+      else if (act === 'copy') {
+        try { await navigator.clipboard.writeText(quoteText(p)); b.textContent = 'Copied'; setTimeout(() => { if (b.isConnected) b.textContent = 'Copy quote'; }, 1600); }
+        catch (err) { const el = $('.err', form); el.textContent = 'Couldn’t copy. Your browser blocked the clipboard.'; el.hidden = false; }
+      }
+    };
+  }
+  function quoteText(p) {
+    const lines = quoteRows.filter((r) => (Number(r.qty) || 0) > 0).map((r) => {
+      const t = quoteRowTotal(r, p);
+      if (r.kind === 'thumb') return `${r.qty} × ${r.label || 'Thumbnail'} (${cash(r.level)}${Number(r.extra) ? ` + ${r.extra} extra ${Number(r.extra) === 1 ? 'character' : 'characters'} × ${cash(p.extraCharacter)}` : ''}) = ${cash(t)}`;
+      const marks = r.kind === 'face' ? Number(r.marks) || 0 : 0;
+      return `${r.qty} × ${r.label || 'Item'} at ${cash(r.unit)}${marks ? ` + ${marks} ${marks === 1 ? 'scar/marking' : 'scars/markings'} × ${cash(p.feature)}` : ''} = ${cash(t)}`;
+    });
+    return [...lines, `Total: ${cash(quoteRows.reduce((s, r) => s + quoteRowTotal(r, p), 0))}`].join('\n');
+  }
+
   /* ---------- events ---------- */
   function setView(v) {
     state.view = v;
@@ -1677,6 +2371,8 @@ dialog form::before {
   document.querySelector('.views').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
   $('#client-filter').addEventListener('change', (e) => { state.client = e.target.value; animateAll = true; render(); });
   $('#search').addEventListener('input', (e) => { state.q = e.target.value; render(); });
+  $('#wait-days').addEventListener('change', (e) => { settings().waitDays = Math.max(1, Math.round(Number(e.target.value) || 3)); e.target.value = settings().waitDays; commit(); });
+  $('#quote').addEventListener('click', () => quoteDialog());
   $('#currency').addEventListener('change', (e) => { state.currency = e.target.value.trim() || '$'; e.target.value = state.currency; commit(); });
 
   document.addEventListener('dragover', (e) => {
@@ -1692,7 +2388,11 @@ dialog form::before {
     document.querySelectorAll('.folio.dragging').forEach((x) => x.classList.remove('dragging'));
     if (!f || !e.dataTransfer || !e.dataTransfer.files.length) return;
     e.preventDefault();
-    uploadFiles(f.dataset.cid, [...e.dataTransfer.files]);
+    const dropped = [...e.dataTransfer.files];
+    const psds = dropped.filter((x) => /\.ps[db]$/i.test(x.name));
+    const rest = dropped.filter((x) => !psds.includes(x));
+    if (psds.length) psdExportDialog(f.dataset.cid, psds[0]);
+    if (rest.length) uploadFiles(f.dataset.cid, rest);
   });
 
   document.addEventListener('click', (e) => {
@@ -1721,6 +2421,7 @@ dialog form::before {
     else if (act === 'edit-commission') commissionDialog(b.dataset.id);
     else if (act === 'add-piece') pieceDialog(b.dataset.id);
     else if (act === 'add-files') pickFiles(b.dataset.id);
+    else if (act === 'psd-export') pickPsd(b.dataset.id);
     else if (act === 'log-payout') payoutDialog(b.dataset.id);
     else if (act === 'edit-piece') pieceDialog(b.dataset.c, b.dataset.p);
     else if (act === 'sync') syncDialog();
