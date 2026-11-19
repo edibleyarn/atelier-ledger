@@ -733,7 +733,7 @@ dialog form::before {
 
   <footer class="foot">
     <span class="sync"><span class="dot off" id="sync-dot"></span><span id="sync-text">Saved in this browser only</span><button type="button" class="link" id="sync-open">Sync settings</button></span>
-    <span class="foot-set"><label>Ink pot holds <input id="capacity" type="number" min="1" step="1" value="12"> pieces</label><label>Flag waits after <input id="wait-days" type="number" min="1" step="1" value="3"> days</label><label>Currency symbol <input id="currency" maxlength="4" value="$"></label><label><input type="checkbox" id="sound" checked> Sounds</label><label>Candlelight <select id="candle"><option value="auto">By your clock</option><option value="on">Always</option><option value="off">Off</option></select></label></span>
+    <span class="foot-set"><label>Ink pot holds <input id="capacity" type="number" min="1" step="1" value="5"> commissions</label><label>Flag waits after <input id="wait-days" type="number" min="1" step="1" value="3"> days</label><label>Currency symbol <input id="currency" maxlength="4" value="$"></label><label><input type="checkbox" id="sound" checked> Sounds</label><label>Candlelight <select id="candle"><option value="auto">By your clock</option><option value="on">Always</option><option value="off">Off</option></select></label></span>
   </footer>
 </div>
 
@@ -1061,7 +1061,7 @@ dialog form::before {
     state.settings = d && d.settings && typeof d.settings === 'object' ? d.settings : {};
     $('#currency').value = state.currency;
     $('#wait-days').value = settings().waitDays;
-    $('#capacity').value = settings().capacity || 12;
+    $('#capacity').value = settings().potCommissions || 5;
   }
   function commit() {
     state.savedAt = new Date().toISOString();
@@ -1412,7 +1412,7 @@ dialog form::before {
     const earnedParts = [earned.money || !earned.robux ? ['money', earned.money] : null, earned.robux ? ['robux', earned.robux] : null].filter(Boolean);
     const owedParts = [due.money ? money(due.money) : '', due.robux ? robux(due.robux) : ''].filter(Boolean);
     $('#seals').innerHTML = `
-      ${(() => { const load = deskLoad(), cap = settings().capacity || 12, over = load > cap; return `<div class="seal wash pot${over ? ' over' : ''}">${inkpot(load, cap)}<span class="k">Pieces on your desk</span><span class="v">${load}</span><span class="s">${over ? `${load - cap} more than your ink pot holds` : `Room for ${cap - load} more`}</span></div>`; })()}
+      ${(() => { const load = deskLoad(), cap = settings().potCommissions || 5, over = load > cap; return `<div class="seal wash pot${over ? ' over' : ''}">${inkpot(load, cap)}<span class="k">Commissions on your desk</span><span class="v">${load}</span><span class="s">${over ? `${load - cap} more than your ink pot holds` : `Room for ${cap - load} more`}</span></div>`; })()}
       <div class="seal ${overdue ? 'red' : ''}">${GLYPH[1]}<span class="k">Due within 7 days</span><span class="v">${dueSoon + overdue}</span>${overdue ? `<span class="s">${overdue} overdue</span>` : ''}</div>
       <div class="seal gold">${GLYPH[2]}<span class="k">Earned so far</span><span class="v ${earnedParts.length > 1 ? 'multi' : ''}" id="earned">${earnedParts.map(([k, v]) => `<span data-kind="${k}">${esc(amt(k, v))}</span>`).join('<br>')}</span>${owedParts.length ? `<span class="s">Still owed: ${esc(owedParts.join(' · '))}</span>` : ''}</div>`;
     if (!sealsShown) { document.querySelectorAll('#seals .seal').forEach((el, k) => { el.classList.add('enter'); el.style.setProperty('--i', k); }); sealsShown = true; }
@@ -2414,7 +2414,7 @@ dialog form::before {
     const s = (state.settings ||= {});
     s.prices = { ...DEFAULT_PRICES, ...(s.prices || {}) };
     if (!(s.waitDays > 0)) s.waitDays = 3;
-    if (!(s.capacity > 0)) s.capacity = 12;
+    if (!(s.potCommissions > 0)) s.potCommissions = 5;
     return s;
   }
   const cash = (n) => state.currency + ((Number(n) || 0) % 1 ? (Number(n) || 0).toFixed(2) : String(Number(n) || 0));
@@ -2764,10 +2764,9 @@ dialog form::before {
   }
 
   /* ---------- ink pot: how much is on the desk ---------- */
+  /* commissions not yet sealed, started or not */
   function deskLoad() {
-    let n = 0;
-    for (const c of Object.values(state.commissions)) for (const p of c.pieces || []) if (!(p.steps || []).length || !(p.steps || []).every((s) => s.status === 'done')) n++;
-    return n;
+    return Object.values(state.commissions).filter((c) => !derive(c).finished).length;
   }
   function inkpot(load, cap) {
     const f = Math.min(1, load / cap), over = load > cap;
@@ -3027,7 +3026,7 @@ dialog form::before {
   document.querySelector('.views').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
   $('#client-filter').addEventListener('change', (e) => { state.client = e.target.value; animateAll = true; render(); });
   $('#search').addEventListener('input', (e) => { state.q = e.target.value; render(); });
-  $('#capacity').addEventListener('change', (e) => { settings().capacity = Math.max(1, Math.round(Number(e.target.value) || 12)); e.target.value = settings().capacity; commit(); });
+  $('#capacity').addEventListener('change', (e) => { settings().potCommissions = Math.max(1, Math.round(Number(e.target.value) || 5)); e.target.value = settings().potCommissions; commit(); });
   $('#sound').checked = sfx.on();
   $('#sound').addEventListener('change', (e) => { lsSet(LS_SOUND, e.target.checked ? 'on' : 'off'); if (e.target.checked) sfx.play('plip'); });
   $('#candle').value = lsGet(LS_CANDLE) || 'auto';
